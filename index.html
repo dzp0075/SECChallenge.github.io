@@ -831,7 +831,7 @@ Miss St = Mississippi State'></textarea>
     return pts;
   }
 
-  function computeTeamResults(){
+  function computeTeamResults(mode = getStandingsMode()){
     const totals = new Map(state.teams.map(t => [t, {wins:0, losses:0}]));
     const confWins = new Map(state.teams.map(t => [t, 0]));
 
@@ -841,19 +841,21 @@ Miss St = Mississippi State'></textarea>
 
         const awayIsSEC = isSECName(g.away);
         const homeIsSEC = isSECName(g.home);
+        const isConfGame = awayIsSEC && homeIsSEC;
+        const countOverall = mode === "all" || isConfGame;
 
-        if(awayIsSEC){
+        if(awayIsSEC && countOverall){
           const r = totals.get(g.away) || {wins:0, losses:0};
           if(g.winner === g.away) r.wins++; else r.losses++;
           totals.set(g.away, r);
         }
-        if(homeIsSEC){
+        if(homeIsSEC && countOverall){
           const r = totals.get(g.home) || {wins:0, losses:0};
           if(g.winner === g.home) r.wins++; else r.losses++;
           totals.set(g.home, r);
         }
 
-        if(awayIsSEC && homeIsSEC){
+        if(isConfGame){
           if(g.winner === g.away) confWins.set(g.away, (confWins.get(g.away) || 0) + 1);
           if(g.winner === g.home) confWins.set(g.home, (confWins.get(g.home) || 0) + 1);
         }
@@ -861,6 +863,11 @@ Miss St = Mississippi State'></textarea>
     }
 
     const actualOrder = state.teams.slice().sort((a,b)=>{
+      if(mode === "all"){
+        const at = totals.get(a) || {wins:0, losses:0};
+        const bt = totals.get(b) || {wins:0, losses:0};
+        return (bt.wins - at.wins) || (at.losses - bt.losses) || a.localeCompare(b);
+      }
       const aw = confWins.get(a) || 0;
       const bw = confWins.get(b) || 0;
       return (bw - aw) || a.localeCompare(b);
@@ -886,7 +893,7 @@ Miss St = Mississippi State'></textarea>
 
     if(!p || !p.preseason) return out;
 
-    const { totals, actualOrder } = computeTeamResults();
+    const { totals, actualOrder } = computeTeamResults(getStandingsMode());
 
     out.upset.predicted = p.preseason.biggestUpset || "";
     const aU = norm(out.upset.actual);
