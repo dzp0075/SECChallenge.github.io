@@ -1,282 +1,86 @@
 <!doctype html>
 <html lang="en">
-
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>SEC Picks + Preseason Tracker (ESPN)</title>
   <link rel="icon" href="data:,">
   <style>
-    :root {
-      --bg: #0b1220;
-      --card: #0f1a2f;
-      --card2: #0d1730;
-      --border: rgba(255, 255, 255, .10);
-      --text: #e6eefc;
-      --muted: rgba(230, 238, 252, .75);
-      --btn: #1b2a4d;
-      --btn2: #24365f;
-      --good: #2ce28a;
-      --bad: #ff5b5b;
-      --warn: #ffc14a;
-      --shadow: 0 20px 60px rgba(0, 0, 0, .45);
-      --r: 16px;
-      font-synthesis-weight: none;
+    :root{
+      --bg:#0b1220; --card:#0f1a2f; --card2:#0d1730; --border:rgba(255,255,255,.10);
+      --text:#e6eefc; --muted:rgba(230,238,252,.75); --btn:#1b2a4d; --btn2:#24365f;
+      --good:#2ce28a; --bad:#ff5b5b; --warn:#ffc14a; --shadow:0 20px 60px rgba(0,0,0,.45);
+      --r:16px; font-synthesis-weight:none;
     }
-
-    * {
-      box-sizing: border-box
-    }
-
-    body {
-      margin: 0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
       background:
-        radial-gradient(900px 500px at 20% 10%, rgba(67, 110, 255, .18), transparent 60%),
-        radial-gradient(900px 500px at 80% 30%, rgba(0, 255, 180, .12), transparent 60%),
-        radial-gradient(700px 400px at 50% 95%, rgba(255, 200, 80, .10), transparent 60%),
+        radial-gradient(900px 500px at 20% 10%, rgba(67,110,255,.18), transparent 60%),
+        radial-gradient(900px 500px at 80% 30%, rgba(0,255,180,.12), transparent 60%),
+        radial-gradient(700px 400px at 50% 95%, rgba(255,200,80,.10), transparent 60%),
         var(--bg);
-      color: var(--text);
+      color:var(--text);
     }
-
-    .wrap {
-      max-width: 1200px;
-      margin: 24px auto;
-      padding: 0 16px 80px
+    .wrap{max-width:1200px; margin:24px auto; padding:0 16px 80px}
+    h1{margin:0 0 6px; font-size:22px; font-weight:800}
+    .grid{display:grid; grid-template-columns:1.1fr .9fr; gap:14px}
+    @media(max-width:980px){.grid{grid-template-columns:1fr}}
+    .card{
+      background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+      border:1px solid var(--border); border-radius:var(--r);
+      box-shadow:var(--shadow); padding:14px;
     }
-
-    h1 {
-      margin: 0 0 6px;
-      font-size: 22px;
-      font-weight: 800
+    .card h2{margin:0 0 10px; font-size:15px}
+    .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+    .sp{justify-content:space-between}
+    .col{display:flex; flex-direction:column; gap:8px}
+    label{font-size:12px; color:var(--muted)}
+    input,select,textarea{
+      background:rgba(0,0,0,.25); border:1px solid var(--border); color:var(--text);
+      padding:10px 10px; border-radius:12px; outline:none; width:100%;
     }
-
-    .sub {
-      margin: 0 0 16px;
-      color: var(--muted);
-      font-size: 13px
+    textarea{min-height:90px; resize:vertical}
+    .btn{
+      background:linear-gradient(180deg, var(--btn2), var(--btn));
+      border:1px solid var(--border); color:var(--text);
+      padding:10px 12px; border-radius:12px; cursor:pointer;
+      font-weight:700; font-size:13px; white-space:nowrap;
     }
-
-    .grid {
-      display: grid;
-      grid-template-columns: 1.1fr .9fr;
-      gap: 14px
+    .btn:hover{filter:brightness(1.08)}
+    .btn.danger{background:linear-gradient(180deg,#4d1b1b,#3a1212)}
+    .pill{
+      display:inline-flex; align-items:center; gap:6px; padding:6px 10px;
+      border-radius:999px; border:1px solid var(--border);
+      background:rgba(0,0,0,.25); color:var(--muted); font-size:12px
     }
-
-    @media (max-width:980px) {
-      .grid {
-        grid-template-columns: 1fr
-      }
+    .ok{color:var(--good)} .bad{color:var(--bad)} .warn{color:var(--warn)}
+    .split{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+    @media(max-width:700px){.split{grid-template-columns:1fr}}
+    .list{border:1px dashed var(--border); border-radius:14px; padding:10px}
+    .list .item{
+      display:flex; justify-content:space-between; gap:10px; align-items:center;
+      padding:8px 10px; border-radius:12px; background:rgba(255,255,255,.02);
+      border:1px solid rgba(255,255,255,.06); margin-bottom:8px;
     }
-
-    .card {
-      background: linear-gradient(180deg, rgba(255, 255, 255, .03), rgba(255, 255, 255, .01));
-      border: 1px solid var(--border);
-      border-radius: var(--r);
-      box-shadow: var(--shadow);
-      padding: 14px;
+    .list .item:last-child{margin-bottom:0}
+    .small{font-size:12px; color:var(--muted)}
+    table{width:100%; border-collapse:collapse}
+    th,td{padding:10px 8px; border-bottom:1px solid rgba(255,255,255,.08); text-align:left; font-size:13px}
+    th{color:var(--muted); font-weight:800; font-size:12px}
+    .right{text-align:right}
+    .game{
+      padding:10px; border-radius:14px; border:1px solid rgba(255,255,255,.08);
+      background:rgba(0,0,0,.22); display:grid; gap:6px;
     }
-
-    .card h2 {
-      margin: 0 0 10px;
-      font-size: 15px
-    }
-
-    .row {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      align-items: center
-    }
-
-    .sp {
-      justify-content: space-between
-    }
-
-    .col {
-      display: flex;
-      flex-direction: column;
-      gap: 8px
-    }
-
-    label {
-      font-size: 12px;
-      color: var(--muted)
-    }
-
-    input,
-    select,
-    textarea {
-      background: rgba(0, 0, 0, .25);
-      border: 1px solid var(--border);
-      color: var(--text);
-      padding: 10px 10px;
-      border-radius: 12px;
-      outline: none;
-      width: 100%;
-    }
-
-    textarea {
-      min-height: 90px;
-      resize: vertical
-    }
-
-    .btn {
-      background: linear-gradient(180deg, var(--btn2), var(--btn));
-      border: 1px solid var(--border);
-      color: var(--text);
-      padding: 10px 12px;
-      border-radius: 12px;
-      cursor: pointer;
-      font-weight: 700;
-      font-size: 13px;
-      white-space: nowrap;
-    }
-
-    .btn:hover {
-      filter: brightness(1.08)
-    }
-
-    .btn.danger {
-      background: linear-gradient(180deg, #4d1b1b, #3a1212)
-    }
-
-    .pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 6px 10px;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      background: rgba(0, 0, 0, .25);
-      color: var(--muted);
-      font-size: 12px
-    }
-
-    .ok {
-      color: var(--good)
-    }
-
-    .bad {
-      color: var(--bad)
-    }
-
-    .warn {
-      color: var(--warn)
-    }
-
-    .split {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px
-    }
-
-    @media (max-width:700px) {
-      .split {
-        grid-template-columns: 1fr
-      }
-    }
-
-    .list {
-      border: 1px dashed var(--border);
-      border-radius: 14px;
-      padding: 10px
-    }
-
-    .list .item {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      align-items: center;
-      padding: 8px 10px;
-      border-radius: 12px;
-      background: rgba(255, 255, 255, .02);
-      border: 1px solid rgba(255, 255, 255, .06);
-      margin-bottom: 8px;
-    }
-
-    .list .item:last-child {
-      margin-bottom: 0
-    }
-
-    .small {
-      font-size: 12px;
-      color: var(--muted)
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse
-    }
-
-    th,
-    td {
-      padding: 10px 8px;
-      border-bottom: 1px solid rgba(255, 255, 255, .08);
-      text-align: left;
-      font-size: 13px
-    }
-
-    th {
-      color: var(--muted);
-      font-weight: 800;
-      font-size: 12px
-    }
-
-    .right {
-      text-align: right
-    }
-
-    .game {
-      padding: 10px;
-      border-radius: 14px;
-      border: 1px solid rgba(255, 255, 255, .08);
-      background: rgba(0, 0, 0, .22);
-      display: grid;
-      gap: 6px;
-    }
-
-    .gTop {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      align-items: center
-    }
-
-    .gTeams {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      align-items: center
-    }
-
-    .tag {
-      font-size: 11px;
-      color: var(--muted);
-      border: 1px solid rgba(255, 255, 255, .12);
-      padding: 3px 8px;
-      border-radius: 999px
-    }
-
-    .win {
-      color: var(--good);
-      font-weight: 900
-    }
-
-    .muted {
-      color: var(--muted)
-    }
-
-    .hr {
-      height: 1px;
-      background: rgba(255, 255, 255, .10);
-      margin: 10px 0
-    }
-
-    .mono {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-    }
-
+    .gTop{display:flex; justify-content:space-between; gap:10px; align-items:center}
+    .gTeams{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+    .tag{font-size:11px; color:var(--muted); border:1px solid rgba(255,255,255,.12); padding:3px 8px; border-radius:999px}
+    .win{color:var(--good); font-weight:900}
+    .muted{color:var(--muted)}
+    .hr{height:1px; background:rgba(255,255,255,.10); margin:10px 0}
+    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace}
   </style>
 </head>
 
@@ -289,16 +93,17 @@
       <button class="btn" id="newPlayerBtn">New Player</button>
       <button class="btn danger" id="logoutBtn" style="display:none">Logout</button>
       <button class="btn" id="adminBtn">Admin</button>
+      <span class="pill" id="statusPill">Ready</span>
+      <span class="pill" id="remotePill" title="Shared league sync status">Shared: off</span>
     </div>
 
     <div class="grid">
-
       <!-- LEFT -->
       <div class="col">
 
         <div class="card" id="leagueSetup">
           <div class="row sp">
-            <h2>League Setup</h2>
+            <h2>League Setup (Admin)</h2>
             <div class="row">
               <button class="btn" id="exportBtn">Export JSON</button>
               <button class="btn" id="importBtn">Import JSON</button>
@@ -327,15 +132,14 @@ Miss St = Mississippi State'></textarea>
 
               <div class="split">
                 <div>
-                  <label>Season Year</label>
+                  <label>Season Year (admin)</label>
                   <input id="yearBox" type="number" min="2000" max="2100" />
                 </div>
                 <div class="col">
-                  <label>Scoring (edit)</label>
+                  <label>Scoring (admin)</label>
                   <div class="split">
                     <input id="ptsWeekly" type="number" min="0" step="1" title="Weekly pick" />
-                    <input id="ptsStanding" type="number" min="0" step="1"
-                      title="Correct SEC standing (per position)" />
+                    <input id="ptsStanding" type="number" min="0" step="1" title="Correct SEC standing (per position)" />
                     <input id="ptsExact" type="number" min="0" step="1" title="Exact record" />
                     <input id="ptsWithin" type="number" min="0" step="1" title="Within ±1 win" />
                     <input id="ptsUpset" type="number" min="0" step="1" title="Biggest upset" />
@@ -345,9 +149,8 @@ Miss St = Mississippi State'></textarea>
                 </div>
               </div>
 
-              <div class="row" style="margin-top:8px; justify-content:space-between;">
-                <span class="pill" id="statusPill">Ready</span>
-                <span class="small">Standings can be “conference-only” or “all games”.</span>
+              <div class="small" style="margin-top:6px;">
+                Admin controls: year, teams, map, scoring, ESPN sync, actual upset, shared data.
               </div>
             </div>
           </div>
@@ -395,8 +198,7 @@ Miss St = Mississippi State'></textarea>
 
             <div class="col">
               <label>Player picks (winner + double-down)</label>
-              <div class="small">Pick a winner for every game. Choose one double-down game (worth 2× for that game).
-              </div>
+              <div class="small">Pick a winner for every game. Choose one double-down game (worth 2× for that game).</div>
               <div class="hr"></div>
 
               <div class="row">
@@ -424,10 +226,9 @@ Miss St = Mississippi State'></textarea>
           <div id="scoreboardBox"></div>
         </div>
 
-        <!-- ✅ Actual Results card now contains Preseason Predictions + Actual Upset -->
         <div class="card">
           <h2>Actual results (auto-built)</h2>
-          <div class="small">Switch between conference-only standings (SEC vs SEC) or all-games standings.</div>
+          <div class="small">Conference wins are SEC vs SEC only. Total wins are all games.</div>
           <div class="hr"></div>
 
           <div id="actualsBox"></div>
@@ -435,8 +236,7 @@ Miss St = Mississippi State'></textarea>
           <div class="hr"></div>
 
           <h2>Preseason Predictions</h2>
-          <div class="small">Set preseason picks for the active player. Scoring is included in the scoreboard “Pre”
-            column.</div>
+          <div class="small">Set preseason picks for the active player. Scoring is included in the scoreboard “Pre” column.</div>
           <div class="hr"></div>
 
           <div class="row">
@@ -447,8 +247,7 @@ Miss St = Mississippi State'></textarea>
           <div class="split" style="margin-top:8px;">
             <div class="col">
               <label>Final SEC standings (pick teams for each position)</label>
-              <div class="small">Use the dropdowns below. (Duplicates are allowed, but you probably don’t want them.)
-              </div>
+              <div class="small">Use the dropdowns below. (Duplicates are allowed, but you probably don’t want them.)</div>
               <div class="hr"></div>
               <div id="preStandingsUI"></div>
             </div>
@@ -474,7 +273,7 @@ Miss St = Mississippi State'></textarea>
               <input id="actualUpsetBox" placeholder="Example: Vanderbilt over Alabama (Week 6)" />
               <button class="btn" id="saveActualUpsetBtn">Save</button>
             </div>
-            <div class="small">Used for preseason upset scoring (text match).</div>
+            <div class="small">Used for preseason upset scoring (text match). Admin-only.</div>
           </div>
         </div>
 
@@ -482,13 +281,8 @@ Miss St = Mississippi State'></textarea>
     </div>
 
     <!-- Preseason Breakdown Modal -->
-    <div id="preModal" style="
-      position:fixed; inset:0; display:none; align-items:center; justify-content:center;
-      background:rgba(0,0,0,.55); padding:18px; z-index:9999;">
-      <div style="
-        width:min(560px, 100%); border:1px solid rgba(255,255,255,.12);
-        border-radius:16px; background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(0,0,0,.35));
-        box-shadow:0 20px 60px rgba(0,0,0,.55); padding:14px;">
+    <div id="preModal" style="position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,.55); padding:18px; z-index:9999;">
+      <div style="width:min(560px, 100%); border:1px solid rgba(255,255,255,.12); border-radius:16px; background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(0,0,0,.35)); box-shadow:0 20px 60px rgba(0,0,0,.55); padding:14px;">
         <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
           <div>
             <div id="preModalTitle" style="font-weight:900; font-size:15px;">Preseason breakdown</div>
@@ -497,10 +291,7 @@ Miss St = Mississippi State'></textarea>
           <button class="btn danger" id="preModalClose">Close</button>
         </div>
         <div class="hr"></div>
-        <pre id="preModalBody" class="mono" style="
-          margin:0; white-space:pre-wrap; line-height:1.35;
-          background:rgba(0,0,0,.25); border:1px solid rgba(255,255,255,.10);
-          border-radius:14px; padding:10px;"></pre>
+        <pre id="preModalBody" class="mono" style="margin:0; white-space:pre-wrap; line-height:1.35; background:rgba(0,0,0,.25); border:1px solid rgba(255,255,255,.10); border-radius:14px; padding:10px;"></pre>
       </div>
     </div>
 
@@ -509,465 +300,468 @@ Miss St = Mississippi State'></textarea>
         const STORAGE_KEY = "sec_picks_espn_v1";
         const MIN_WEEK = 1;
         const MAX_WEEK = 14;
-        const DEFAULT_STANDINGS_MODE = "conf"; // "conf" | "all"
+        const DEFAULT_STANDINGS_MODE = "conf";
+        const ESPN_BASE = "https://site.api.espn.com/apis/site/v2/sports/football/college-football/scoreboard";
+
+        // Shared storage (Apps Script)
+        const REMOTE_URL = "https://script.google.com/macros/s/AKfycbwF9b3YmPSnLHkot6dYXlSkBH1PbOEQ_4O1cIt-qyndWJlf4_6ddmUMCsjIQjakFcBE/exec";
+        const ADMIN_KEY_SESSION = "sec_admin_key_v1"; // sessionStorage
+        const ADMIN_FLAG_KEY = "sec_admin_flag_v1";
+        const ADMIN_PIN = "1234"; // CHANGE THIS
 
         const DEFAULT_TEAMS = [
-          "Alabama", "Arkansas", "Auburn", "Florida", "Georgia", "Kentucky", "LSU", "Mississippi State",
-          "Missouri", "Oklahoma", "Ole Miss", "South Carolina", "Tennessee", "Texas", "Texas A&M", "Vanderbilt"
+          "Alabama","Arkansas","Auburn","Florida","Georgia","Kentucky","LSU","Mississippi State",
+          "Missouri","Oklahoma","Ole Miss","South Carolina","Tennessee","Texas","Texas A&M","Vanderbilt"
         ];
 
         const DEFAULT_TEAM_MAP = {
-          "Missouri": "Missouri Tigers",
-          "Auburn": "Auburn Tigers",
-          "Alabama": "Alabama Crimson Tide",
-          "Georgia": "Georgia Bulldogs",
-          "Florida": "Florida Gators",
-          "LSU": "LSU Tigers",
-          "Tennessee": "Tennessee Volunteers",
-          "Texas": "Texas Longhorns",
-          "Texas A&M": "Texas A&M Aggies",
-          "Oklahoma": "Oklahoma Sooners",
-          "Ole Miss": "Ole Miss Rebels",
-          "Mississippi State": "Mississippi St",
-          "South Carolina": "South Carolina Gamecocks",
-          "Kentucky": "Kentucky Wildcats",
-          "Arkansas": "Arkansas Razorbacks",
-          "Vanderbilt": "Vanderbilt Commodores"
+          "Missouri":"Missouri Tigers","Auburn":"Auburn Tigers","Alabama":"Alabama Crimson Tide","Georgia":"Georgia Bulldogs",
+          "Florida":"Florida Gators","LSU":"LSU Tigers","Tennessee":"Tennessee Volunteers","Texas":"Texas Longhorns",
+          "Texas A&M":"Texas A&M Aggies","Oklahoma":"Oklahoma Sooners","Ole Miss":"Ole Miss Rebels","Mississippi State":"Mississippi St",
+          "South Carolina":"South Carolina Gamecocks","Kentucky":"Kentucky Wildcats","Arkansas":"Arkansas Razorbacks","Vanderbilt":"Vanderbilt Commodores"
         };
 
-        const DEFAULT_SCORING = {
-          weeklyPick: 1,
-          correctStanding: 2,
-          exactRecord: 3,
-          withinOne: 1,
-          correctUpset: 5,
-          poty: 0
-        };
+        const DEFAULT_SCORING = { weeklyPick:1, correctStanding:2, exactRecord:3, withinOne:1, correctUpset:5, poty:0 };
 
-        const ESPN_BASE = "https://site.api.espn.com/apis/site/v2/sports/football/college-football/scoreboard";
         const $ = (id) => document.getElementById(id);
+        const uid = () => Math.random().toString(16).slice(2) + Date.now().toString(16);
+        const norm = (s) => String(s || "").toLowerCase().replace(/&/g,"and").replace(/[^a-z0-9]+/g,"").trim();
+        window.norm = norm;
 
-        const SESSION_PLAYER_KEY = "sec_session_player_id_v1";
-        const SESSION_PLAYER_NAME_KEY = "sec_session_player_name_v1";
+        function escapeHtml(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+        function escapeAttr(s){return escapeHtml(s).replace(/"/g,"&quot;")}
+        const safeValue=(id,v)=>{const el=$(id); if(el) el.value=v;};
 
-        function getSessionPlayer() {
-          const pid = sessionStorage.getItem(SESSION_PLAYER_KEY);
-          return state.players.find(p => p.id === pid) || null;
+        function setStatus(msg,tone=""){
+          const pill=$("statusPill"); if(!pill) return;
+          pill.textContent=msg; pill.classList.remove("ok","bad","warn"); if(tone) pill.classList.add(tone);
+        }
+        function setRemotePill(on,text){
+          const p=$("remotePill"); if(!p) return;
+          p.textContent=text|| (on?"Shared: on":"Shared: off");
+          p.classList.toggle("ok",!!on); p.classList.toggle("warn",!on);
         }
 
-        function setSessionPlayer(p) {
-          sessionStorage.setItem(SESSION_PLAYER_KEY, p.id);
-          sessionStorage.setItem(SESSION_PLAYER_NAME_KEY, p.name);
+        const SESSION_PLAYER_KEY="sec_session_player_id_v1";
+        const SESSION_PLAYER_NAME_KEY="sec_session_player_name_v1";
+
+        function isAdmin(){ return sessionStorage.getItem(ADMIN_FLAG_KEY)==="1"; }
+
+        function adminLogin(){
+          const pin=prompt("Enter admin PIN:"); if(!pin) return;
+          if(pin!==ADMIN_PIN) return alert("Wrong PIN.");
+          sessionStorage.setItem(ADMIN_FLAG_KEY,"1");
+          const existing=sessionStorage.getItem(ADMIN_KEY_SESSION)||"";
+          const k=prompt("Enter adminKey for shared storage (Apps Script):", existing);
+          if(k) sessionStorage.setItem(ADMIN_KEY_SESSION,k);
+          setStatus("Admin mode enabled.","ok");
+          updateAuthUI(); renderAll();
+        }
+        function adminLogout(){
+          sessionStorage.removeItem(ADMIN_FLAG_KEY);
+          setStatus("Admin mode disabled.","warn");
+          updateAuthUI(); renderAll();
         }
 
-        function clearSessionPlayer() {
+        function getSessionPlayer(){
+          const pid=sessionStorage.getItem(SESSION_PLAYER_KEY);
+          return state.players.find(p=>p.id===pid)||null;
+        }
+        function setSessionPlayer(p){
+          sessionStorage.setItem(SESSION_PLAYER_KEY,p.id);
+          sessionStorage.setItem(SESSION_PLAYER_NAME_KEY,p.name);
+        }
+        function clearSessionPlayer(){
           sessionStorage.removeItem(SESSION_PLAYER_KEY);
           sessionStorage.removeItem(SESSION_PLAYER_NAME_KEY);
         }
 
-        const norm = (s) => String(s || "")
-          .toLowerCase()
-          .replace(/&/g, "and")
-          .replace(/[^a-z0-9]+/g, "")
-          .trim();
-        window.norm = norm;
+        function loginExistingPlayer(){
+          const name=prompt("Enter your name (case-insensitive):"); if(!name) return;
+          const p=state.players.find(x=>norm(x.name)===norm(name));
+          if(!p) return alert("Player not found.");
+          setSessionPlayer(p); renderAll(); updateAuthUI();
+        }
+        function createNewPlayer(){
+          const name=prompt("Enter your name:"); if(!name) return;
+          if(state.players.some(p=>norm(p.name)===norm(name))) return alert("That name already exists. Use Login instead.");
+          const p={ id:uid(), name:name.trim(), preseason:{standingsOrder:[], records:{}, biggestUpset:""} };
+          state.players.push(p); saveState(); setSessionPlayer(p); renderAll(); updateAuthUI();
+        }
+        function logout(){ clearSessionPlayer(); renderAll(); updateAuthUI(); }
 
-        const uid = () => Math.random().toString(16).slice(2) + Date.now().toString(16);
+        function setEditingEnabled(on){
+          $("savePicksBtn") && ($("savePicksBtn").disabled=!on);
+          $("savePreseasonBtn") && ($("savePreseasonBtn").disabled=!on);
+        }
 
-        function loginExistingPlayer() {
-          const name = prompt("Enter your name (case-insensitive):");
-          if (!name) return;
+        async function remoteGetState(){
+          const url=`${REMOTE_URL}?action=get&ts=${Date.now()}`;
+          const res=await fetch(url,{cache:"no-store"});
+          const data=await res.json();
+          if(data && data.ok) return data.state||null;
+          throw new Error(data?.error||"Remote get failed");
+        }
+        async function remotePutAdmin(patchObj){
+          const adminKey=sessionStorage.getItem(ADMIN_KEY_SESSION)||"";
+          if(!adminKey) throw new Error("Missing adminKey (Admin -> enter adminKey).");
+          const url=`${REMOTE_URL}?action=put`;
+          const res=await fetch(url,{
+            method:"POST",
+            headers:{"Content-Type":"application/json"},
+            body:JSON.stringify({adminKey, patch: patchObj})
+          });
+          const data=await res.json().catch(()=>({}));
+          if(!res.ok || !data.ok) throw new Error(data?.error||`Remote put failed (${res.status})`);
+        }
+        function applyRemoteToLocal(remoteState){
+          if(!remoteState) return;
+          state.year=Number(remoteState.year||state.year);
+          if(Array.isArray(remoteState.teams)) state.teams=remoteState.teams;
+          if(remoteState.teamMap) state.teamMap=remoteState.teamMap;
+          if(remoteState.scoring) state.scoring=remoteState.scoring;
+          if(remoteState.preseasonActual) state.preseasonActual=remoteState.preseasonActual;
 
-          const p = state.players.find(x => norm(x.name) === norm(name));
-          if (!p) {
-            alert("Player not found.");
-            return;
+          if(Array.isArray(remoteState.weeks)){
+            const localPicksByWeekNum=new Map((state.weeks||[]).map(w=>[w.weekNumber, w.picks||{}]));
+            state.weeks=remoteState.weeks.map(w=>{
+              const picks=localPicksByWeekNum.get(w.weekNumber)||{};
+              return {...w, picks};
+            });
           }
-
-          setSessionPlayer(p);
-          renderAll();
-          updateAuthUI();
+          if(remoteState.updatedAt!=null) state.remoteUpdatedAt=remoteState.updatedAt;
         }
 
-        function createNewPlayer() {
-          const name = prompt("Enter your name:");
-          if (!name) return;
-
-          if (state.players.some(p => norm(p.name) === norm(name))) {
-            alert("That name already exists. Use Login instead.");
-            return;
-          }
-
-          const p = {
-            id: uid(),
-            name: name.trim(),
-            preseason: { standingsOrder: [], records: {}, biggestUpset: "" }
-          };
-
-          state.players.push(p);
-          saveState();
-          setSessionPlayer(p);
-          renderAll();
-          updateAuthUI();
-        }
-
-        function logout() {
-          clearSessionPlayer();
-          renderAll();
-          updateAuthUI();
-        }
-
-        function setEditingEnabled(on) {
-          $("savePicksBtn") && ($("savePicksBtn").disabled = !on);
-          $("savePreseasonBtn") && ($("savePreseasonBtn").disabled = !on);
-        }
-
-        const ADMIN_FLAG_KEY = "sec_admin_flag_v1";
-        const ADMIN_PIN = "1234"; // <-- change this
-
-        function isAdmin() {
-          return sessionStorage.getItem(ADMIN_FLAG_KEY) === "1";
-        }
-
-        function adminLogin() {
-          const pin = prompt("Enter admin PIN:");
-          if (!pin) return;
-          if (pin === ADMIN_PIN) {
-            sessionStorage.setItem(ADMIN_FLAG_KEY, "1");
-            setStatus("Admin mode enabled.", "ok");
-            renderAll();
-            updateAuthUI();
-          } else {
-            alert("Wrong PIN.");
-          }
-        }
-
-        function adminLogout() {
-          sessionStorage.removeItem(ADMIN_FLAG_KEY);
-          setStatus("Admin mode disabled.", "warn");
-          renderAll();
-          updateAuthUI();
-        }
-
-        const safeText = (id, text) => { const el = $(id); if (el) el.textContent = text; };
-        const safeValue = (id, value) => { const el = $(id); if (el) el.value = value; };
-
-        function loadState() {
-          const raw = localStorage.getItem(STORAGE_KEY);
-          if (!raw) {
+        function loadState(){
+          const raw=localStorage.getItem(STORAGE_KEY);
+          if(!raw){
             return {
-              year: new Date().getFullYear(),
-              teams: [...DEFAULT_TEAMS],
-              teamMap: { ...DEFAULT_TEAM_MAP },
-              scoring: { ...DEFAULT_SCORING },
-              players: [],
-              weeks: [],
-              standingsMode: DEFAULT_STANDINGS_MODE,
-              preseasonActual: { biggestUpset: "" }
+              year:new Date().getFullYear(),
+              teams:[...DEFAULT_TEAMS],
+              teamMap:{...DEFAULT_TEAM_MAP},
+              scoring:{...DEFAULT_SCORING},
+              players:[],
+              weeks:[],
+              standingsMode:DEFAULT_STANDINGS_MODE,
+              preseasonActual:{biggestUpset:""},
+              remoteUpdatedAt:0
             };
           }
-          try { return JSON.parse(raw); }
-          catch { localStorage.removeItem(STORAGE_KEY); return loadState(); }
+          try{ return JSON.parse(raw); }
+          catch{ localStorage.removeItem(STORAGE_KEY); return loadState(); }
         }
+        function saveState(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
 
-        function saveState() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+        let state=loadState();
+        if(!state.teamMap || Object.keys(state.teamMap).length===0) state.teamMap={...DEFAULT_TEAM_MAP};
+        if(!state.preseasonActual) state.preseasonActual={biggestUpset:""};
+        if(!state.scoring) state.scoring={...DEFAULT_SCORING};
+        if(!state.standingsMode) state.standingsMode=DEFAULT_STANDINGS_MODE;
 
-        function setStatus(msg, tone = "") {
-          const pill = $("statusPill");
-          if (!pill) return;
-          pill.textContent = msg;
-          pill.classList.remove("ok", "bad", "warn");
-          if (tone) pill.classList.add(tone);
-        }
+        function updateAuthUI(){
+          const loggedIn=!!getSessionPlayer();
+          const admin=isAdmin();
 
-        let state = loadState();
-        if (!state.teamMap || Object.keys(state.teamMap).length === 0) {
-          state.teamMap = { ...DEFAULT_TEAM_MAP };
-          saveState();
-        }
+          $("loginBtn") && ($("loginBtn").style.display=loggedIn?"none":"");
+          $("newPlayerBtn") && ($("newPlayerBtn").style.display=loggedIn?"none":"");
+          $("logoutBtn") && ($("logoutBtn").style.display=loggedIn?"":"none");
+          $("adminBtn") && ($("adminBtn").textContent=admin?"Admin (On)":"Admin");
 
-        if (!state.preseasonActual) state.preseasonActual = { biggestUpset: "" };
-        if (!state.scoring) state.scoring = { ...DEFAULT_SCORING };
-        if (!state.standingsMode) state.standingsMode = DEFAULT_STANDINGS_MODE;
+          const ls=$("leagueSetup");
+          if(ls) ls.style.display=admin?"":"none";
 
-        function getStandingsMode() { return "conf"; }
-        function setStandingsMode(mode) { state.standingsMode = "conf"; saveState(); renderActuals(); }
+          const au=$("actualUpsetBox"), aub=$("saveActualUpsetBtn");
+          if(au) au.disabled=!admin;
+          if(aub) aub.disabled=!admin;
 
-        function ensureWeekExists() {
-          if (!Array.isArray(state.weeks)) state.weeks = [];
-          if (state.weeks.length === 0) {
-            for (let w = MIN_WEEK; w <= MAX_WEEK; w++) {
-              state.weeks.push({ id: uid(), name: `Week ${w}`, weekNumber: w, games: [], picks: {} });
-            }
-            return;
-          }
-          state.weeks.forEach((wk, idx) => {
-            if (!wk.id) wk.id = uid();
-            if (typeof wk.weekNumber !== "number") wk.weekNumber = (MIN_WEEK + idx);
-            if (!wk.name) wk.name = `Week ${wk.weekNumber}`;
-            if (!wk.games) wk.games = [];
-            if (!wk.picks) wk.picks = {};
-          });
-          state.weeks = state.weeks
-            .filter(wk => wk.weekNumber >= MIN_WEEK && wk.weekNumber <= MAX_WEEK)
-            .sort((a, b) => a.weekNumber - b.weekNumber);
+          const syncWeekBtn=$("syncESPNBtn"), syncAllBtn=$("syncAllBtn"), saveWeekBtn=$("saveWeekBtn");
+          if(syncWeekBtn) syncWeekBtn.disabled=!admin;
+          if(syncAllBtn) syncAllBtn.disabled=!admin;
+          if(saveWeekBtn) saveWeekBtn.disabled=!admin;
 
-          const have = new Set(state.weeks.map(wk => wk.weekNumber));
-          for (let w = MIN_WEEK; w <= MAX_WEEK; w++) {
-            if (!have.has(w)) {
-              state.weeks.push({ id: uid(), name: `Week ${w}`, weekNumber: w, games: [], picks: {} });
-            }
-          }
-          state.weeks.sort((a, b) => a.weekNumber - b.weekNumber);
-        }
-
-        function getWeek() {
-          const wid = $("weekSelect").value;
-          return state.weeks.find(w => w.id === wid) || state.weeks[0] || null;
-        }
-
-        function getActivePlayer() {
-          return getSessionPlayer();
-        }
-
-        function updateAuthUI() {
-          const loggedIn = !!getSessionPlayer();
-          const admin = isAdmin();
-
-          $("loginBtn") && ($("loginBtn").style.display = loggedIn ? "none" : "");
-          $("newPlayerBtn") && ($("newPlayerBtn").style.display = loggedIn ? "none" : "");
-          $("logoutBtn") && ($("logoutBtn").style.display = loggedIn ? "" : "none");
-
-          // League setup only visible to admin
-          const ls = $("leagueSetup");
-          if (ls) ls.style.display = admin ? "" : "none";
-
-          // Actual upset admin-only
-          const au = $("actualUpsetBox");
-          const aub = $("saveActualUpsetBtn");
-          if (au) au.disabled = !admin;
-          if (aub) aub.disabled = !admin;
-
-          // Players can still save their own picks if logged in
           setEditingEnabled(loggedIn);
         }
 
+        function ensureWeekExists(){
+          if(!Array.isArray(state.weeks)) state.weeks=[];
+          if(state.weeks.length===0){
+            for(let w=MIN_WEEK; w<=MAX_WEEK; w++){
+              state.weeks.push({id:uid(), name:`Week ${w}`, weekNumber:w, games:[], picks:{}});
+            }
+            return;
+          }
+          state.weeks.forEach((wk,idx)=>{
+            if(!wk.id) wk.id=uid();
+            if(typeof wk.weekNumber!=="number") wk.weekNumber=(MIN_WEEK+idx);
+            if(!wk.name) wk.name=`Week ${wk.weekNumber}`;
+            if(!wk.games) wk.games=[];
+            if(!wk.picks) wk.picks={};
+          });
+          state.weeks=state.weeks.filter(wk=>wk.weekNumber>=MIN_WEEK && wk.weekNumber<=MAX_WEEK).sort((a,b)=>a.weekNumber-b.weekNumber);
+          const have=new Set(state.weeks.map(wk=>wk.weekNumber));
+          for(let w=MIN_WEEK; w<=MAX_WEEK; w++){
+            if(!have.has(w)) state.weeks.push({id:uid(), name:`Week ${w}`, weekNumber:w, games:[], picks:{}});
+          }
+          state.weeks.sort((a,b)=>a.weekNumber-b.weekNumber);
+        }
 
-        function parseMapBox(text) {
-          const out = {};
-          (text || "").split("\n").map(l => l.trim()).filter(Boolean).forEach(line => {
-            const idx = line.indexOf("=");
-            if (idx === -1) return;
-            const left = line.slice(0, idx).trim();
-            const right = line.slice(idx + 1).trim();
-            if (left && right) out[left] = right;
+        function getWeek(){
+          const ws=$("weekSelect");
+          const wid=ws?ws.value:"";
+          return state.weeks.find(w=>w.id===wid) || state.weeks[0] || null;
+        }
+        function buildWeekMeta(week){
+          const g=week.games||[];
+          const confCount=g.filter(x=>x.confGame).length;
+          const finalCount=g.filter(x=>x.winner).length;
+          return `Games loaded: ${g.length} • SEC vs SEC: ${confCount} • Finals: ${finalCount}`;
+        }
+
+        function parseMapBox(text){
+          const out={};
+          (text||"").split("\n").map(l=>l.trim()).filter(Boolean).forEach(line=>{
+            const idx=line.indexOf("=");
+            if(idx===-1) return;
+            const left=line.slice(0,idx).trim();
+            const right=line.slice(idx+1).trim();
+            if(left && right) out[left]=right;
           });
           return out;
         }
-
-        function localNameFromESPN(espnName) {
-          const mapEntries = Object.entries(state.teamMap || {});
-          const n = norm(espnName);
-          for (const [local, espn] of mapEntries) {
-            if (norm(espn) === n) return local;
-          }
-          for (const t of state.teams) {
-            if (norm(t) === n) return t;
-          }
+        function localNameFromESPN(espnName){
+          const mapEntries=Object.entries(state.teamMap||{});
+          const n=norm(espnName);
+          for(const [local,espn] of mapEntries){ if(norm(espn)===n) return local; }
+          for(const t of state.teams){ if(norm(t)===n) return t; }
           return espnName;
         }
-
-        function isSECName(name) {
-          const n = norm(name);
-          return state.teams.some(t => norm(t) === n) ||
-            Object.entries(state.teamMap || {}).some(([local, espn]) => norm(local) === n || norm(espn) === n);
+        function isSECName(name){
+          const n=norm(name);
+          return state.teams.some(t=>norm(t)===n) || Object.entries(state.teamMap||{}).some(([local,espn])=>norm(local)===n || norm(espn)===n);
         }
-        window.localNameFromESPN = localNameFromESPN;
 
-        async function fetchESPNScoreboard({ year, weekNumber }) {
-          const espnWeek = Number(weekNumber);
-          const u = new URL(ESPN_BASE);
-          u.searchParams.set("groups", "8");
-          u.searchParams.set("seasontype", "2");
-          u.searchParams.set("week", String(espnWeek));
-          u.searchParams.set("year", String(year));
-          u.searchParams.set("limit", "400");
-
-          const res = await fetch(u.toString(), { cache: "no-store" });
-          if (!res.ok) throw new Error(`ESPN error ${res.status}`);
+        async function fetchESPNScoreboard({year,weekNumber}){
+          const u=new URL(ESPN_BASE);
+          u.searchParams.set("groups","8");
+          u.searchParams.set("seasontype","2");
+          u.searchParams.set("week", String(Number(weekNumber)));
+          u.searchParams.set("year", String(Number(year)));
+          u.searchParams.set("limit","400");
+          const res=await fetch(u.toString(),{cache:"no-store"});
+          if(!res.ok) throw new Error(`ESPN error ${res.status}`);
           return res.json();
         }
+        function parseESPNGames(json){
+          const events=json?.events||[];
+          const games=[];
+          for(const ev of events){
+            const comp=ev?.competitions?.[0];
+            const competitors=comp?.competitors||[];
+            const awayC=competitors.find(c=>c.homeAway==="away");
+            const homeC=competitors.find(c=>c.homeAway==="home");
+            if(!awayC || !homeC) continue;
 
-        function parseESPNGames(json) {
-          const events = json?.events || [];
-          const games = [];
+            const awayRaw=awayC?.team?.shortDisplayName || awayC?.team?.abbreviation || awayC?.team?.displayName || awayC?.team?.name || "Away";
+            const homeRaw=homeC?.team?.shortDisplayName || homeC?.team?.abbreviation || homeC?.team?.displayName || homeC?.team?.name || "Home";
 
-          for (const ev of events) {
-            const comp = ev?.competitions?.[0];
-            const competitors = comp?.competitors || [];
-            const awayC = competitors.find(c => c.homeAway === "away");
-            const homeC = competitors.find(c => c.homeAway === "home");
-            if (!awayC || !homeC) continue;
+            const awayLocal=localNameFromESPN(awayRaw);
+            const homeLocal=localNameFromESPN(homeRaw);
 
-            const awayRaw = awayC?.team?.shortDisplayName || awayC?.team?.abbreviation || awayC?.team?.displayName || awayC?.team?.name || "Away";
-            const homeRaw = homeC?.team?.shortDisplayName || homeC?.team?.abbreviation || homeC?.team?.displayName || homeC?.team?.name || "Home";
+            const awayIsSEC=isSECName(awayLocal);
+            const homeIsSEC=isSECName(homeLocal);
+            const confGame=awayIsSEC && homeIsSEC;
 
-            const awayLocal = localNameFromESPN(awayRaw);
-            const homeLocal = localNameFromESPN(homeRaw);
+            const statusType=comp?.status?.type||{};
+            const completed=Boolean(statusType.completed);
 
-            const awayIsSEC = isSECName(awayLocal);
-            const homeIsSEC = isSECName(homeLocal);
-            const confGame = awayIsSEC && homeIsSEC;
+            const awayScore=Number(awayC?.score ?? NaN);
+            const homeScore=Number(homeC?.score ?? NaN);
 
-            const statusType = comp?.status?.type || {};
-            const completed = Boolean(statusType.completed);
-
-            const awayScore = Number(awayC?.score ?? NaN);
-            const homeScore = Number(homeC?.score ?? NaN);
-
-            let winner = "";
-            if (completed) {
-              if (awayC?.winner === true) winner = awayLocal;
-              else if (homeC?.winner === true) winner = homeLocal;
+            let winner="";
+            if(completed){
+              if(awayC?.winner===true) winner=awayLocal;
+              else if(homeC?.winner===true) winner=homeLocal;
             }
 
-            const start = comp?.date || ev?.date || "";
+            const start=comp?.date || ev?.date || "";
 
             games.push({
-              id: uid(),
-              eventId: ev?.id ? String(ev.id) : "",
-              away: awayLocal,
-              home: homeLocal,
-              confGame,
-              start,
-              awayScore: Number.isFinite(awayScore) ? awayScore : null,
-              homeScore: Number.isFinite(homeScore) ? homeScore : null,
+              id:uid(), eventId: ev?.id?String(ev.id):"",
+              away:awayLocal, home:homeLocal, confGame, start,
+              awayScore:Number.isFinite(awayScore)?awayScore:null,
+              homeScore:Number.isFinite(homeScore)?homeScore:null,
               winner
             });
           }
           return games;
         }
-
-        function mergeGamesPreservePicks(oldGames, newGames) {
-          const oldByEvent = new Map(oldGames.filter(g => g.eventId).map(g => [g.eventId, g]));
-          const oldByKey = new Map(oldGames.map(g => [`${norm(g.away)}@${norm(g.home)}|${g.start?.slice(0, 10)}`, g]));
-          return newGames.map(ng => {
-            const key = `${norm(ng.away)}@${norm(ng.home)}|${ng.start?.slice(0, 10)}`;
-            const match = (ng.eventId && oldByEvent.get(ng.eventId)) || oldByKey.get(key);
-            if (!match) return ng;
-            return { ...ng, id: match.id };
+        function mergeGamesPreserveIds(oldGames,newGames){
+          const oldByEvent=new Map(oldGames.filter(g=>g.eventId).map(g=>[g.eventId,g]));
+          const oldByKey=new Map(oldGames.map(g=>[`${norm(g.away)}@${norm(g.home)}|${(g.start||"").slice(0,10)}`, g]));
+          return newGames.map(ng=>{
+            const key=`${norm(ng.away)}@${norm(ng.home)}|${(ng.start||"").slice(0,10)}`;
+            const match=(ng.eventId && oldByEvent.get(ng.eventId)) || oldByKey.get(key);
+            if(!match) return ng;
+            return {...ng, id:match.id};
           });
         }
 
-        function buildWeekMeta(week) {
-          const g = week.games || [];
-          const confCount = g.filter(x => x.confGame).length;
-          const finalCount = g.filter(x => x.winner).length;
-          return `Games loaded: ${g.length} • SEC vs SEC: ${confCount} • Finals: ${finalCount}`;
+        async function syncSpecificWeek(week){
+          const weekNumber=Number(week.weekNumber);
+          if(!Number.isFinite(weekNumber) || weekNumber<MIN_WEEK || weekNumber>MAX_WEEK) return;
+          const year=Number(state.year);
+          const data=await fetchESPNScoreboard({year, weekNumber});
+          const newGames=parseESPNGames(data);
+          if(!newGames.length) return;
+
+          week.games=mergeGamesPreserveIds(week.games||[], newGames);
+
+          if(!week.picks) week.picks={};
+          state.players.forEach(p=>{
+            if(!week.picks[p.id]) week.picks[p.id]={ winners:{}, doubleDownGameId:"" };
+            const winners=week.picks[p.id].winners||{};
+            week.games.forEach(g=>{ if(!(g.id in winners)) winners[g.id]=""; });
+            week.picks[p.id].winners=winners;
+          });
         }
 
-        function renderTeams() { $("teamsBox") && ($("teamsBox").value = (state.teams || []).join("\n")); }
-
-        function renderMap() {
-          const lines = Object.entries(state.teamMap || {}).map(([k, v]) => `${k} = ${v}`);
-          $("mapBox") && ($("mapBox").value = lines.join("\n"));
+        function clearAllWeeksGames(){
+          state.weeks.forEach(w=>{ w.games=[]; });
         }
 
-        function renderScoring() {
-          $("ptsWeekly") && ($("ptsWeekly").value = state.scoring.weeklyPick ?? 1);
-          $("ptsStanding") && ($("ptsStanding").value = state.scoring.correctStanding ?? 2);
-          $("ptsExact") && ($("ptsExact").value = state.scoring.exactRecord ?? 3);
-          $("ptsWithin") && ($("ptsWithin").value = state.scoring.withinOne ?? 1);
-          $("ptsUpset") && ($("ptsUpset").value = state.scoring.correctUpset ?? 5);
-          $("ptsPOTY") && ($("ptsPOTY").value = state.scoring.poty ?? 0);
+        async function syncWeekFromESPN(){
+          if(!isAdmin()) return alert("Admin only.");
+          const week=getWeek();
+          const weekNumber=Number($("weekNumberBox").value);
+          if(!Number.isFinite(weekNumber) || weekNumber<MIN_WEEK || weekNumber>MAX_WEEK) return alert(`Enter a valid week number (${MIN_WEEK}–${MAX_WEEK}).`);
+
+          const year=Number($("yearBox").value || state.year);
+          state.year=year;
+          week.weekNumber=weekNumber;
+          week.name=`Week ${weekNumber}`;
+
+          setStatus("Syncing ESPN…","warn");
+          try{
+            await syncSpecificWeek(week);
+            await remotePutAdmin({ year: state.year, weeks: state.weeks, preseasonActual: state.preseasonActual, teams: state.teams, teamMap: state.teamMap, scoring: state.scoring });
+            const remote=await remoteGetState();
+            applyRemoteToLocal(remote);
+            saveState(); renderAll();
+            setStatus(`Synced Week ${weekNumber} (shared)`,"ok");
+          }catch(e){
+            console.error(e);
+            setStatus("Sync failed.","bad");
+            alert(String(e?.message||e));
+          }
         }
 
-        function escapeHtml(s) {
-          return String(s ?? "").replace(/[&<>"']/g, c => ({
-            "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
-          }[c]));
+        async function syncAllWeeks(){
+          if(!isAdmin()) return alert("Admin only.");
+          const y=Number($("yearBox").value || state.year);
+          if(Number.isFinite(y)) state.year=y;
+
+          clearAllWeeksGames();
+          setStatus("Syncing ALL weeks…","warn");
+          try{
+            const weeks=state.weeks.slice().filter(w=>w.weekNumber>=MIN_WEEK && w.weekNumber<=MAX_WEEK).sort((a,b)=>a.weekNumber-b.weekNumber);
+            for(const w of weeks) await syncSpecificWeek(w);
+
+            await remotePutAdmin({ year: state.year, weeks: state.weeks, preseasonActual: state.preseasonActual, teams: state.teams, teamMap: state.teamMap, scoring: state.scoring });
+            const remote=await remoteGetState();
+            applyRemoteToLocal(remote);
+
+            saveState(); renderAll();
+            setStatus(`All weeks synced (shared) — ${state.year}`,"ok");
+          }catch(e){
+            console.error(e);
+            setStatus("All-weeks sync failed.","bad");
+            alert(String(e?.message||e));
+          }
         }
-        function escapeAttr(s) { return escapeHtml(s).replace(/"/g, "&quot;"); }
 
-        function renderPlayers() {
-          const box = $("playersList");
-          if (!box) return;
+        function renderTeams(){ $("teamsBox") && ($("teamsBox").value=(state.teams||[]).join("\n")); }
+        function renderMap(){
+          const lines=Object.entries(state.teamMap||{}).map(([k,v])=>`${k} = ${v}`);
+          $("mapBox") && ($("mapBox").value=lines.join("\n"));
+        }
+        function renderScoring(){
+          $("ptsWeekly") && ($("ptsWeekly").value=state.scoring.weeklyPick ?? 1);
+          $("ptsStanding") && ($("ptsStanding").value=state.scoring.correctStanding ?? 2);
+          $("ptsExact") && ($("ptsExact").value=state.scoring.exactRecord ?? 3);
+          $("ptsWithin") && ($("ptsWithin").value=state.scoring.withinOne ?? 1);
+          $("ptsUpset") && ($("ptsUpset").value=state.scoring.correctUpset ?? 5);
+          $("ptsPOTY") && ($("ptsPOTY").value=state.scoring.poty ?? 0);
+        }
 
-          box.innerHTML = "";
-          if (state.players.length === 0) {
-            box.innerHTML = `<div class="small">No players yet.</div>`;
-            $("activePlayer") && ($("activePlayer").innerHTML = "");
-            $("prePlayerSelect") && ($("prePlayerSelect").innerHTML = "");
+        function renderPlayers(){
+          const box=$("playersList"); if(!box) return;
+          box.innerHTML="";
+          if(state.players.length===0){
+            box.innerHTML=`<div class="small">No players yet.</div>`;
+            $("activePlayer") && ($("activePlayer").innerHTML="");
+            $("prePlayerSelect") && ($("prePlayerSelect").innerHTML="");
             return;
           }
-
-          state.players.forEach(p => {
-            const div = document.createElement("div");
-            div.className = "item";
-            div.innerHTML = `
+          state.players.forEach(p=>{
+            const div=document.createElement("div");
+            div.className="item";
+            div.innerHTML=`
               <div>
                 <div style="font-weight:900">${escapeHtml(p.name)}</div>
                 <div class="small mono">${p.id}</div>
               </div>
               <button class="btn danger">Remove</button>
             `;
-            div.querySelector("button").onclick = () => {
-              state.players = state.players.filter(x => x.id !== p.id);
-              state.weeks.forEach(w => { if (w.picks) delete w.picks[p.id]; });
+            div.querySelector("button").onclick=()=>{
+              if(!isAdmin()) return alert("Admin only.");
+              state.players=state.players.filter(x=>x.id!==p.id);
+              state.weeks.forEach(w=>{ if(w.picks) delete w.picks[p.id]; });
               saveState(); renderAll();
             };
             box.appendChild(div);
           });
 
-          const sel = $("activePlayer");
-          if (sel) {
-            const prev = sel.value;
-            sel.innerHTML = state.players.map(p => `<option value="${p.id}">${escapeHtml(p.name)}</option>`).join("");
-            if (prev && state.players.some(p => p.id === prev)) sel.value = prev;
+          const sel=$("activePlayer");
+          if(sel){
+            const prev=sel.value;
+            sel.innerHTML=state.players.map(p=>`<option value="${p.id}">${escapeHtml(p.name)}</option>`).join("");
+            if(prev && state.players.some(p=>p.id===prev)) sel.value=prev;
           }
-
-          const preSel = $("prePlayerSelect");
-          if (preSel) {
-            const prev2 = preSel.value;
-            preSel.innerHTML = state.players.map(p => `<option value="${p.id}">${escapeHtml(p.name)}</option>`).join("");
-            if (prev2 && state.players.some(p => p.id === prev2)) preSel.value = prev2;
+          const preSel=$("prePlayerSelect");
+          if(preSel){
+            const prev2=preSel.value;
+            preSel.innerHTML=state.players.map(p=>`<option value="${p.id}">${escapeHtml(p.name)}</option>`).join("");
+            if(prev2 && state.players.some(p=>p.id===prev2)) preSel.value=prev2;
           }
         }
 
-        function renderWeeks() {
-          const ws = $("weekSelect");
-          if (!ws) return;
-          const prev = ws.value;
-          const sorted = state.weeks.slice().sort((a, b) => a.weekNumber - b.weekNumber);
-
-          ws.innerHTML = sorted
-            .map(w => `<option value="${w.id}">${escapeHtml(w.name || `Week ${w.weekNumber}`)}</option>`)
-            .join("");
-
-          if (prev && state.weeks.some(w => w.id === prev)) ws.value = prev;
-          else if (sorted.length) ws.value = sorted[0].id;
+        function renderWeeks(){
+          const ws=$("weekSelect"); if(!ws) return;
+          const prev=ws.value;
+          const sorted=state.weeks.slice().sort((a,b)=>a.weekNumber-b.weekNumber);
+          ws.innerHTML=sorted.map(w=>`<option value="${w.id}">${escapeHtml(w.name || `Week ${w.weekNumber}`)}</option>`).join("");
+          if(prev && state.weeks.some(w=>w.id===prev)) ws.value=prev;
+          else if(sorted.length) ws.value=sorted[0].id;
         }
 
-        function renderGames(week) {
-          const box = $("gamesBox");
-          if (!box) return;
-          box.innerHTML = "";
-          const games = week.games || [];
-          if (games.length === 0) {
-            box.innerHTML = `<div class="small muted">No games loaded yet. Click <b>Sync</b>.</div>`;
+        function renderGames(week){
+          const box=$("gamesBox"); if(!box) return;
+          box.innerHTML="";
+          const games=week.games||[];
+          if(games.length===0){
+            box.innerHTML=`<div class="small muted">No games loaded yet. Admin: click <b>Sync</b>.</div>`;
             return;
           }
-
-          games.forEach(g => {
-            const d = document.createElement("div");
-            d.className = "game";
-            const dateTxt = g.start ? new Date(g.start).toLocaleString() : "";
-            const scoreTxt = (g.awayScore != null && g.homeScore != null) ? `${g.awayScore}–${g.homeScore}` : "";
-            const tag = g.confGame ? `<span class="tag">SEC vs SEC</span>` : `<span class="tag">SEC game</span>`;
-            const winTxt = g.winner
+          games.forEach(g=>{
+            const d=document.createElement("div");
+            d.className="game";
+            const dateTxt=g.start ? new Date(g.start).toLocaleString() : "";
+            const scoreTxt=(g.awayScore!=null && g.homeScore!=null) ? `${g.awayScore}–${g.homeScore}` : "";
+            const tag=g.confGame ? `<span class="tag">SEC vs SEC</span>` : `<span class="tag">SEC game</span>`;
+            const winTxt=g.winner
               ? `<span class="tag"><span class="win">FINAL</span> • Winner: ${escapeHtml(g.winner)}</span>`
               : `<span class="tag muted">Not final yet</span>`;
-            d.innerHTML = `
+            d.innerHTML=`
               <div class="gTop">
                 <div class="gTeams">
                   ${tag}
@@ -984,34 +778,28 @@ Miss St = Mississippi State'></textarea>
           });
         }
 
-        function renderPicksUI(week) {
-          const wrap = $("picksUI");
-          if (!wrap) return;
-          wrap.innerHTML = "";
-          const p = getActivePlayer();
-          const games = week.games || [];
+        function renderPicksUI(week){
+          const wrap=$("picksUI"); if(!wrap) return;
+          wrap.innerHTML="";
+          const p=getSessionPlayer();
+          const games=week.games||[];
 
-          if (!p) {
-            wrap.innerHTML = `
-              <div class="small">
-                You’re viewing in read-only mode. Click <b>Login</b> or <b>New Player</b> to make picks.
-              </div>
-            `;
+          if(!p){
+            wrap.innerHTML=`<div class="small">You’re viewing in read-only mode. Click <b>Login</b> or <b>New Player</b> to make picks.</div>`;
+            return;
+          }
+          if(games.length===0){
+            wrap.innerHTML=`<div class="small">Waiting on admin to sync games.</div>`;
             return;
           }
 
-          if (games.length === 0) {
-            wrap.innerHTML = `<div class="small">Sync games first.</div>`;
-            return;
-          }
+          if(!week.picks) week.picks={};
+          if(!week.picks[p.id]) week.picks[p.id]={ winners:{}, doubleDownGameId:"" };
+          const pk=week.picks[p.id];
 
-          if (!week.picks) week.picks = {};
-          if (!week.picks[p.id]) week.picks[p.id] = { winners: {}, doubleDownGameId: "" };
-          const pk = week.picks[p.id];
-
-          const ddRow = document.createElement("div");
-          ddRow.className = "col";
-          ddRow.innerHTML = `
+          const ddRow=document.createElement("div");
+          ddRow.className="col";
+          ddRow.innerHTML=`
             <label>Double-down game</label>
             <select id="ddSelect"></select>
             <div class="small">One per week. If correct, worth <b>2×</b> for that game.</div>
@@ -1019,29 +807,24 @@ Miss St = Mississippi State'></textarea>
           `;
           wrap.appendChild(ddRow);
 
-          const ddSelect = ddRow.querySelector("#ddSelect");
-          ddSelect.innerHTML = `<option value="">(none)</option>` + games.map(g => {
-            const label = `${g.away} @ ${g.home}`;
+          const ddSelect=ddRow.querySelector("#ddSelect");
+          ddSelect.innerHTML=`<option value="">(none)</option>` + games.map(g=>{
+            const label=`${g.away} @ ${g.home}`;
             return `<option value="${g.id}">${escapeHtml(label)}</option>`;
           }).join("");
-          ddSelect.value = pk.doubleDownGameId || "";
+          ddSelect.value=pk.doubleDownGameId||"";
+          ddSelect.onchange=()=>{ pk.doubleDownGameId=ddSelect.value; saveState(); renderScoreboard(); };
 
-          ddSelect.onchange = () => {
-            pk.doubleDownGameId = ddSelect.value;
-            saveState();
-            renderScoreboard();
-          };
+          games.forEach(g=>{
+            const div=document.createElement("div");
+            div.className="game";
+            const picked=pk.winners[g.id]||"";
+            const isFinal=Boolean(g.winner);
+            const isCorrect=isFinal && picked && picked===g.winner;
+            const isWrong=isFinal && picked && picked!==g.winner;
+            const dd=(pk.doubleDownGameId===g.id);
 
-          games.forEach(g => {
-            const div = document.createElement("div");
-            div.className = "game";
-            const picked = pk.winners[g.id] || "";
-            const isFinal = Boolean(g.winner);
-            const isCorrect = isFinal && picked && picked === g.winner;
-            const isWrong = isFinal && picked && picked !== g.winner;
-            const dd = (pk.doubleDownGameId === g.id);
-
-            div.innerHTML = `
+            div.innerHTML=`
               <div class="gTop">
                 <div class="gTeams">
                   <span class="tag">${dd ? "DOUBLE-DOWN" : "Pick"}</span>
@@ -1061,91 +844,61 @@ Miss St = Mississippi State'></textarea>
                 </select>
               </div>
             `;
-            const sel = div.querySelector("select[data-game]");
-            sel.value = picked;
-            sel.onchange = () => {
-              pk.winners[g.id] = sel.value;
-              saveState();
-              renderScoreboard();
-            };
+            const sel=div.querySelector("select[data-game]");
+            sel.value=picked;
+            sel.onchange=()=>{ pk.winners[g.id]=sel.value; saveState(); renderScoreboard(); };
             wrap.appendChild(div);
           });
         }
 
-        function computeTeamResults(mode = getStandingsMode()) {
-          const secSet = new Set(state.teams.map(t => norm(t)));
-          const totals = new Map(state.teams.map(t => [t, { wins: 0, losses: 0 }]));
-          const confWins = new Map(state.teams.map(t => [t, 0]));
+        function computeTeamResultsAllGames(){
+          const secSet=new Set(state.teams.map(t=>norm(t)));
+          const totals=new Map(state.teams.map(t=>[t,{wins:0,losses:0}]));
+          const confWins=new Map(state.teams.map(t=>[t,0]));
 
-          for (const w of state.weeks) {
-            for (const g of (w.games || [])) {
-              if (!g.winner) continue;
+          for(const w of state.weeks){
+            for(const g of (w.games||[])){
+              if(!g.winner) continue;
+              const awayLocal=localNameFromESPN(g.away);
+              const homeLocal=localNameFromESPN(g.home);
+              const winnerLocal=localNameFromESPN(g.winner);
 
-              const awayLocal = localNameFromESPN(g.away);
-              const homeLocal = localNameFromESPN(g.home);
-              const winnerLocal = localNameFromESPN(g.winner);
+              const awayIsSEC=secSet.has(norm(awayLocal));
+              const homeIsSEC=secSet.has(norm(homeLocal));
+              const isConfGame=awayIsSEC && homeIsSEC;
 
-              const awayIsSEC = secSet.has(norm(awayLocal));
-              const homeIsSEC = secSet.has(norm(homeLocal));
-
-              const isConfGame = awayIsSEC && homeIsSEC;
-              const countOverall = mode === "all" || isConfGame;
-
-              if (awayIsSEC && countOverall) {
-                const r = totals.get(awayLocal);
-                winnerLocal === awayLocal ? r.wins++ : r.losses++;
+              if(awayIsSEC){
+                const r=totals.get(awayLocal);
+                winnerLocal===awayLocal ? r.wins++ : r.losses++;
               }
-              if (homeIsSEC && countOverall) {
-                const r = totals.get(homeLocal);
-                winnerLocal === homeLocal ? r.wins++ : r.losses++;
+              if(homeIsSEC){
+                const r=totals.get(homeLocal);
+                winnerLocal===homeLocal ? r.wins++ : r.losses++;
               }
-              if (isConfGame) {
-                if (winnerLocal === awayLocal) confWins.set(awayLocal, confWins.get(awayLocal) + 1);
-                if (winnerLocal === homeLocal) confWins.set(homeLocal, confWins.get(homeLocal) + 1);
+              if(isConfGame){
+                if(winnerLocal===awayLocal) confWins.set(awayLocal, confWins.get(awayLocal)+1);
+                if(winnerLocal===homeLocal) confWins.set(homeLocal, confWins.get(homeLocal)+1);
               }
             }
           }
-
-          const actualOrder = state.teams.slice().sort((a, b) => {
-            if (mode === "all") {
-              const at = totals.get(a) || { wins: 0, losses: 0 };
-              const bt = totals.get(b) || { wins: 0, losses: 0 };
-              return (bt.wins - at.wins) || (at.losses - bt.losses) || a.localeCompare(b);
-            }
-            const aw = confWins.get(a) || 0;
-            const bw = confWins.get(b) || 0;
-            return (bw - aw) || a.localeCompare(b);
-          });
-
-          return { totals, confWins, actualOrder };
+          return { totals, confWins };
         }
-        window.computeTeamResults = computeTeamResults;
 
-        function renderActuals() {
-          const { totals, confWins } = computeTeamResults("all");
+        function renderActuals(){
+          const {totals, confWins}=computeTeamResultsAllGames();
+          const arr=state.teams.map(team=>({ team, confWins: confWins.get(team)||0, totalWins:(totals.get(team)?.wins ?? 0) }));
+          arr.sort((a,b)=>(b.confWins-a.confWins)||(b.totalWins-a.totalWins)||a.team.localeCompare(b.team));
 
-          const arr = state.teams.map(team => ({
-            team,
-            confWins: confWins.get(team) || 0,
-            totalWins: (totals.get(team)?.wins ?? 0)
-          }));
-
-          arr.sort((a, b) =>
-            (b.confWins - a.confWins) ||
-            (b.totalWins - a.totalWins) ||
-            a.team.localeCompare(b.team)
-          );
-
-          const rows = arr.map((x, i) => `
+          const rows=arr.map((x,i)=>`
             <tr>
-              <td class="mono">#${i + 1}</td>
+              <td class="mono">#${i+1}</td>
               <td>${escapeHtml(x.team)}</td>
               <td class="right mono">${x.confWins}</td>
               <td class="right mono">${x.totalWins}</td>
             </tr>
           `).join("");
 
-          $("actualsBox").innerHTML = `
+          $("actualsBox").innerHTML=`
             <table>
               <thead>
                 <tr>
@@ -1158,101 +911,117 @@ Miss St = Mississippi State'></textarea>
               <tbody>${rows}</tbody>
             </table>
           `;
-
-          $("actualUpsetBox").value = state.preseasonActual?.biggestUpset || "";
+          $("actualUpsetBox").value=state.preseasonActual?.biggestUpset || "";
         }
-        window.renderActuals = renderActuals;
 
-        function weeklyPointsForPlayer(week, playerId) {
-          const sc = state.scoring.weeklyPick || 1;
-          const pk = week.picks?.[playerId];
-          if (!pk) return 0;
-
-          let pts = 0;
-          for (const g of (week.games || [])) {
-            if (!g.winner) continue;
-            const picked = pk.winners?.[g.id] || "";
-            if (!picked) continue;
-            if (picked === g.winner) {
+        function weeklyPointsForPlayer(week,playerId){
+          const sc=state.scoring.weeklyPick||1;
+          const pk=week.picks?.[playerId];
+          if(!pk) return 0;
+          let pts=0;
+          for(const g of (week.games||[])){
+            if(!g.winner) continue;
+            const picked=pk.winners?.[g.id]||"";
+            if(!picked) continue;
+            if(picked===g.winner){
               pts += sc;
-              if (pk.doubleDownGameId === g.id) pts += sc;
+              if(pk.doubleDownGameId===g.id) pts += sc;
             }
           }
           return pts;
         }
 
-        function computePreseasonBreakdownForPlayer(playerId) {
-          const p = state.players.find(x => x.id === playerId);
-          const sc = state.scoring || {};
-          const P_WITHIN = Number(sc.withinOne || 0);
-          const P_EXACT = Number(sc.exactRecord || 0);
-          const P_STAND = Number(sc.correctStanding || 0);
-          const P_UPSET = Number(sc.correctUpset || 0);
+        function computePreseasonBreakdownForPlayer(playerId){
+          const p=state.players.find(x=>x.id===playerId);
+          const sc=state.scoring||{};
+          const P_WITHIN=Number(sc.withinOne||0);
+          const P_EXACT=Number(sc.exactRecord||0);
+          const P_STAND=Number(sc.correctStanding||0);
+          const P_UPSET=Number(sc.correctUpset||0);
 
-          const out = {
-            total: 0,
-            upset: { pts: 0, hit: false, actual: state.preseasonActual?.biggestUpset || "", predicted: "" },
-            standings: { pts: 0, correct: 0, totalCompared: 0 },
-            records: { pts: 0, exact: 0, within: 0, compared: 0 }
+          const out={
+            total:0,
+            upset:{pts:0, hit:false, actual:state.preseasonActual?.biggestUpset||"", predicted:""},
+            standings:{pts:0, correct:0, totalCompared:0},
+            records:{pts:0, exact:0, within:0, compared:0}
           };
+          if(!p || !p.preseason) return out;
 
-          if (!p || !p.preseason) return out;
+          // build totals+confWins
+          const secSet=new Set(state.teams.map(t=>norm(t)));
+          const totals=new Map(state.teams.map(t=>[t,{wins:0,losses:0}]));
+          const confWins=new Map(state.teams.map(t=>[t,0]));
+          for(const w of state.weeks){
+            for(const g of (w.games||[])){
+              if(!g.winner) continue;
+              const awayLocal=localNameFromESPN(g.away);
+              const homeLocal=localNameFromESPN(g.home);
+              const winnerLocal=localNameFromESPN(g.winner);
+              const awayIsSEC=secSet.has(norm(awayLocal));
+              const homeIsSEC=secSet.has(norm(homeLocal));
+              const isConfGame=awayIsSEC && homeIsSEC;
 
-          const { totals, actualOrder } = computeTeamResults(getStandingsMode());
-
-          out.upset.predicted = p.preseason.biggestUpset || "";
-          const aU = norm(out.upset.actual);
-          const pU = norm(out.upset.predicted);
-          if (aU && pU && aU === pU) {
-            out.upset.hit = true;
-            out.upset.pts = P_UPSET;
-            out.total += out.upset.pts;
+              if(awayIsSEC){
+                const r=totals.get(awayLocal);
+                winnerLocal===awayLocal ? r.wins++ : r.losses++;
+              }
+              if(homeIsSEC){
+                const r=totals.get(homeLocal);
+                winnerLocal===homeLocal ? r.wins++ : r.losses++;
+              }
+              if(isConfGame){
+                if(winnerLocal===awayLocal) confWins.set(awayLocal, confWins.get(awayLocal)+1);
+                if(winnerLocal===homeLocal) confWins.set(homeLocal, confWins.get(homeLocal)+1);
+              }
+            }
           }
+          const actualOrder=state.teams.slice().sort((a,b)=>(confWins.get(b)||0)-(confWins.get(a)||0) || a.localeCompare(b));
 
-          const predictedOrder = Array.isArray(p.preseason.standingsOrder)
-            ? p.preseason.standingsOrder.map(t => String(t || "").trim()).filter(Boolean).map(localNameFromESPN)
+          // upset
+          out.upset.predicted=p.preseason.biggestUpset || "";
+          const aU=norm(out.upset.actual), pU=norm(out.upset.predicted);
+          if(aU && pU && aU===pU){ out.upset.hit=true; out.upset.pts=P_UPSET; out.total += out.upset.pts; }
+
+          // standings
+          const predictedOrder=Array.isArray(p.preseason.standingsOrder)
+            ? p.preseason.standingsOrder.map(t=>String(t||"").trim()).filter(Boolean).map(localNameFromESPN)
             : [];
-
-          const compared = Math.min(actualOrder.length, predictedOrder.length);
-          let correct = 0;
-          for (let i = 0; i < compared; i++) {
-            if (predictedOrder[i] === actualOrder[i]) correct++;
-          }
-          out.standings.correct = correct;
-          out.standings.totalCompared = compared;
-          out.standings.pts = correct * P_STAND;
+          const compared=Math.min(actualOrder.length, predictedOrder.length);
+          let correct=0;
+          for(let i=0;i<compared;i++) if(predictedOrder[i]===actualOrder[i]) correct++;
+          out.standings.correct=correct;
+          out.standings.totalCompared=compared;
+          out.standings.pts=correct*P_STAND;
           out.total += out.standings.pts;
 
-          const recs = p.preseason.records || {};
-          for (const team of state.teams) {
-            const pred = recs[team];
-            const act = totals.get(team);
-            if (!pred || !act) continue;
+          // records
+          const recs=p.preseason.records||{};
+          for(const team of state.teams){
+            const pred=recs[team];
+            const act=totals.get(team);
+            if(!pred || !act) continue;
 
-            const pw = Number(pred.wins);
-            const pl = Number(pred.losses);
-            if (!Number.isFinite(pw) || !Number.isFinite(pl)) continue;
+            const pw=Number(pred.wins), pl=Number(pred.losses);
+            if(!Number.isFinite(pw) || !Number.isFinite(pl)) continue;
 
             out.records.compared++;
-
-            if (pw === act.wins && pl === act.losses) {
+            if(pw===act.wins && pl===act.losses){
               out.records.exact++;
               out.records.pts += P_EXACT;
-            } else if (Math.abs(pw - act.wins) <= 1) {
+            }else if(Math.abs(pw-act.wins)<=1){
               out.records.within++;
               out.records.pts += P_WITHIN;
             }
           }
           out.total += out.records.pts;
-
           return out;
         }
 
-        function preseasonTooltipText(b) {
-          const lines = [];
-          if ((b.upset.actual || "").trim()) {
+        function preseasonTooltipText(b){
+          const lines=[];
+          if((b.upset.actual||"").trim()){
             lines.push(`Upset: ${b.upset.hit ? `+${b.upset.pts}` : "+0"} (pred="${b.upset.predicted || "—"}", actual="${b.upset.actual}")`);
-          } else {
+          }else{
             lines.push(`Upset: +0 (set the actual upset to score)`);
           }
           lines.push(`Standings: +${b.standings.pts} (${b.standings.correct}/${b.standings.totalCompared} correct positions, ${state.scoring.correctStanding} each)`);
@@ -1261,48 +1030,51 @@ Miss St = Mississippi State'></textarea>
           return lines.join("\n");
         }
 
-        function renderScoreboard() {
-          if (state.players.length === 0) {
-            $("scoreboardBox").innerHTML = `<div class="small">Add players to see scores.</div>`;
+        function openPreModal({playerName,prePoints,text}){
+          $("preModalTitle").textContent=`Preseason breakdown — ${playerName}`;
+          $("preModalSub").textContent=`Preseason points: ${prePoints}`;
+          $("preModalBody").textContent=text;
+          $("preModal").style.display="flex";
+        }
+        function closePreModal(){ $("preModal").style.display="none"; }
+
+        function renderScoreboard(){
+          if(state.players.length===0){
+            $("scoreboardBox").innerHTML=`<div class="small">Add players to see scores.</div>`;
             return;
           }
+          const sortedWeeks=state.weeks.slice().sort((a,b)=>a.weekNumber-b.weekNumber);
+          const rows=state.players.map(p=>{
+            const weeklyBreakdown=sortedWeeks.map(w=>weeklyPointsForPlayer(w,p.id));
+            const preBreakdown=computePreseasonBreakdownForPlayer(p.id);
+            const pre=preBreakdown.total;
+            const preTip=preseasonTooltipText(preBreakdown);
+            const weeklyTotal=weeklyBreakdown.reduce((a,b)=>a+b,0);
+            const total=weeklyTotal+pre;
+            return {name:p.name,total,weeklyBreakdown,pre,preTip};
+          }).sort((a,b)=>b.total-a.total || a.name.localeCompare(b.name));
 
-          const sortedWeeks = state.weeks.slice().sort((a, b) => a.weekNumber - b.weekNumber);
-          const visiblePlayers = state.players;
-
-          const rows = visiblePlayers.map(p => {
-            const weeklyBreakdown = sortedWeeks.map(w => weeklyPointsForPlayer(w, p.id));
-            const preBreakdown = computePreseasonBreakdownForPlayer(p.id);
-            const pre = preBreakdown.total;
-            const preTip = preseasonTooltipText(preBreakdown);
-            const weeklyTotal = weeklyBreakdown.reduce((a, b) => a + b, 0);
-            const total = weeklyTotal + pre;
-            return { name: p.name, total, weeklyBreakdown, pre, preTip };
-          }).sort((a, b) => b.total - a.total || a.name.localeCompare(b.name));
-
-          const weekHeaders = sortedWeeks.map(w => `<th class="right">W${w.weekNumber}</th>`).join("") + `<th class="right">Pre</th>`;
-
-          const body = rows.map((r, idx) => {
-            const weeklyCells = r.weeklyBreakdown.map(v => `<td class="right mono">${v}</td>`).join("");
+          const weekHeaders=sortedWeeks.map(w=>`<th class="right">W${w.weekNumber}</th>`).join("") + `<th class="right">Pre</th>`;
+          const body=rows.map((r,idx)=>{
+            const weeklyCells=r.weeklyBreakdown.map(v=>`<td class="right mono">${v}</td>`).join("");
             return `
               <tr>
-                <td class="mono">#${idx + 1}</td>
+                <td class="mono">#${idx+1}</td>
                 <td>${escapeHtml(r.name)}</td>
                 ${weeklyCells}
-                <td
-                  class="right mono preCell"
-                  title="${escapeAttr(r.preTip)}"
-                  data-player="${escapeAttr(r.name)}"
-                  data-pre="${r.pre}"
-                  data-tip="${escapeAttr(r.preTip)}"
-                  style="cursor:pointer; text-decoration:underline; text-underline-offset:3px;"
+                <td class="right mono preCell"
+                    title="${escapeAttr(r.preTip)}"
+                    data-player="${escapeAttr(r.name)}"
+                    data-pre="${r.pre}"
+                    data-tip="${escapeAttr(r.preTip)}"
+                    style="cursor:pointer; text-decoration:underline; text-underline-offset:3px;"
                 >${r.pre}</td>
                 <td class="right mono" style="font-weight:900">${r.total}</td>
               </tr>
             `;
           }).join("");
 
-          $("scoreboardBox").innerHTML = `
+          $("scoreboardBox").innerHTML=`
             <table>
               <thead>
                 <tr>
@@ -1319,222 +1091,113 @@ Miss St = Mississippi State'></textarea>
             </div>
           `;
 
-          $("scoreboardBox").querySelectorAll(".preCell").forEach(td => {
-            td.onclick = () => {
-              openPreModal({
-                playerName: td.getAttribute("data-player") || "Player",
-                prePoints: td.getAttribute("data-pre") || "0",
-                text: td.getAttribute("data-tip") || ""
-              });
-            };
+          $("scoreboardBox").querySelectorAll(".preCell").forEach(td=>{
+            td.onclick=()=>openPreModal({
+              playerName: td.getAttribute("data-player") || "Player",
+              prePoints: td.getAttribute("data-pre") || "0",
+              text: td.getAttribute("data-tip") || ""
+            });
           });
         }
 
-        function getSessionPlayerId() {
-          const pid = sessionStorage.getItem(SESSION_PLAYER_KEY);
-          if (pid && state.players.some(p => p.id === pid)) return pid;
+        function getSessionPlayerId(){
+          const pid=sessionStorage.getItem(SESSION_PLAYER_KEY);
+          if(pid && state.players.some(p=>p.id===pid)) return pid;
           return null;
         }
-
-        function getPrePlayer() {
-          const sid = getSessionPlayerId();
-          return state.players.find(p => p.id === sid) || null;
+        function getPrePlayer(){
+          const sid=getSessionPlayerId();
+          return state.players.find(p=>p.id===sid) || null;
         }
 
-        function recordOptionsHtml(selected) {
-          const sel = String(selected || "");
-          let out = `<option value="">(select)</option>`;
-          for (let w = 12; w >= 0; w--) {
-            const l = 12 - w;
-            const val = `${w}-${l}`;
-            out += `<option value="${val}" ${val === sel ? "selected" : ""}>${val}</option>`;
+        function recordOptionsHtml(selected){
+          const sel=String(selected||"");
+          let out=`<option value="">(select)</option>`;
+          for(let w=12; w>=0; w--){
+            const l=12-w;
+            const val=`${w}-${l}`;
+            out += `<option value="${val}" ${val===sel?"selected":""}>${val}</option>`;
           }
           return out;
         }
 
-        function renderPreseasonUI() {
-          const p = getPrePlayer();
-          const standingsWrap = $("preStandingsUI");
-          const recordsWrap = $("preRecordsUI");
+        function renderPreseasonUI(){
+          const p=getPrePlayer();
+          const standingsWrap=$("preStandingsUI");
+          const recordsWrap=$("preRecordsUI");
 
-          standingsWrap.innerHTML = "";
-          recordsWrap.innerHTML = "";
-          $("preUpsetBox").value = "";
+          standingsWrap.innerHTML="";
+          recordsWrap.innerHTML="";
+          $("preUpsetBox").value="";
 
-          if (!p) {
-            standingsWrap.innerHTML = `<div class="small muted">Login / New Player to set preseason.</div>`;
-            recordsWrap.innerHTML = `<div class="small muted">Login / New Player to set preseason.</div>`;
+          if(!p){
+            standingsWrap.innerHTML=`<div class="small muted">Login / New Player to set preseason.</div>`;
+            recordsWrap.innerHTML=`<div class="small muted">Login / New Player to set preseason.</div>`;
             return;
           }
 
-          if (!p.preseason) p.preseason = {};
-          if (!Array.isArray(p.preseason.standingsOrder)) p.preseason.standingsOrder = [];
-          if (!p.preseason.records) p.preseason.records = {};
-          if (typeof p.preseason.biggestUpset !== "string") p.preseason.biggestUpset = "";
+          if(!p.preseason) p.preseason={};
+          if(!Array.isArray(p.preseason.standingsOrder)) p.preseason.standingsOrder=[];
+          if(!p.preseason.records) p.preseason.records={};
+          if(typeof p.preseason.biggestUpset!=="string") p.preseason.biggestUpset="";
 
-          const opts = state.teams.slice();
-          const makeTeamOptions = (selected) => {
-            const sel = String(selected || "");
-            return `<option value="">(select)</option>` + opts.map(t => {
-              const s = (t === sel) ? "selected" : "";
+          const opts=state.teams.slice();
+          const makeTeamOptions=(selected)=>{
+            const sel=String(selected||"");
+            return `<option value="">(select)</option>` + opts.map(t=>{
+              const s=(t===sel)?"selected":"";
               return `<option value="${escapeAttr(t)}" ${s}>${escapeHtml(t)}</option>`;
             }).join("");
           };
 
-          const grid = document.createElement("div");
-          grid.className = "split";
-          grid.style.gridTemplateColumns = "1fr 1fr";
-          grid.style.gap = "10px";
+          const grid=document.createElement("div");
+          grid.className="split";
+          grid.style.gridTemplateColumns="1fr 1fr";
+          grid.style.gap="10px";
 
-          for (let i = 1; i <= state.teams.length; i++) {
-            const row = document.createElement("div");
-            row.className = "row";
-            row.style.gap = "8px";
-            row.innerHTML = `
+          for(let i=1;i<=state.teams.length;i++){
+            const row=document.createElement("div");
+            row.className="row";
+            row.style.gap="8px";
+            row.innerHTML=`
               <label style="min-width:48px" class="mono">#${i}</label>
-              <select data-pre-rank="${i}" style="flex:1">${makeTeamOptions(p.preseason.standingsOrder[i - 1])}</select>
+              <select data-pre-rank="${i}" style="flex:1">${makeTeamOptions(p.preseason.standingsOrder[i-1])}</select>
             `;
             grid.appendChild(row);
           }
           standingsWrap.appendChild(grid);
 
-          const tbl = document.createElement("table");
-          tbl.innerHTML = `
-            <thead>
-              <tr>
-                <th>Team</th>
-                <th class="right">Record</th>
-              </tr>
-            </thead>
+          const tbl=document.createElement("table");
+          tbl.innerHTML=`
+            <thead><tr><th>Team</th><th class="right">Record</th></tr></thead>
             <tbody></tbody>
           `;
-          const tb = tbl.querySelector("tbody");
-
-          for (const team of state.teams) {
-            const pred = p.preseason.records[team] || null;
-            const recStr = (pred && Number.isFinite(pred.wins) && Number.isFinite(pred.losses)) ? `${pred.wins}-${pred.losses}` : "";
-            const tr = document.createElement("tr");
-            tr.innerHTML = `
+          const tb=tbl.querySelector("tbody");
+          for(const team of state.teams){
+            const pred=p.preseason.records[team] || null;
+            const recStr=(pred && Number.isFinite(pred.wins) && Number.isFinite(pred.losses)) ? `${pred.wins}-${pred.losses}` : "";
+            const tr=document.createElement("tr");
+            tr.innerHTML=`
               <td>${escapeHtml(team)}</td>
               <td class="right">
-                <select data-pre-record="${escapeAttr(team)}">
-                  ${recordOptionsHtml(recStr)}
-                </select>
+                <select data-pre-record="${escapeAttr(team)}">${recordOptionsHtml(recStr)}</select>
               </td>
             `;
             tb.appendChild(tr);
           }
-
           recordsWrap.appendChild(tbl);
-          $("preUpsetBox").value = p.preseason.biggestUpset || "";
+          $("preUpsetBox").value=p.preseason.biggestUpset || "";
         }
 
-        async function syncSpecificWeek(week) {
-          const weekNumber = Number(week.weekNumber);
-          if (!Number.isFinite(weekNumber) || weekNumber < MIN_WEEK || weekNumber > MAX_WEEK) return;
-          const year = Number(state.year);
-
-          const data = await fetchESPNScoreboard({ year, weekNumber });
-          const newGames = parseESPNGames(data);
-          if (!newGames.length) return;
-
-          week.games = mergeGamesPreservePicks(week.games || [], newGames);
-
-          if (!week.picks) week.picks = {};
-          state.players.forEach(p => {
-            if (!week.picks[p.id]) week.picks[p.id] = { winners: {}, doubleDownGameId: "" };
-            const winners = week.picks[p.id].winners || {};
-            week.games.forEach(g => { if (!(g.id in winners)) winners[g.id] = ""; });
-            week.picks[p.id].winners = winners;
-          });
-        }
-
-        async function syncWeekFromESPN() {
-          const week = getWeek();
-          const weekNumber = Number($("weekNumberBox").value);
-          if (!Number.isFinite(weekNumber) || weekNumber < MIN_WEEK || weekNumber > MAX_WEEK) {
-            alert(`Enter a valid week number (${MIN_WEEK}–${MAX_WEEK}).`);
-            return;
-          }
-          const year = Number($("yearBox").value || state.year);
-          state.year = year;
-
-          week.weekNumber = weekNumber;
-          week.name = `Week ${weekNumber}`;
-
-          setStatus("Syncing ESPN…", "warn");
-          try {
-            await syncSpecificWeek(week);
-            saveState();
-            setStatus(`Synced Week ${weekNumber} (${week.games.length} games)`, "ok");
-            renderAll();
-            renderActuals();
-          } catch (e) {
-            console.error(e);
-            setStatus("Sync failed.", "bad");
-            alert(String(e?.message || e));
-          }
-        }
-
-        function clearAllWeeksGames() {
-          state.weeks.forEach(w => {
-            w.games = [];
-            if (w.picks) {
-              Object.values(w.picks).forEach(pk => {
-                if (pk?.winners) {
-                  Object.keys(pk.winners).forEach(k => pk.winners[k] = "");
-                }
-                pk.doubleDownGameId = "";
-              });
-            }
-          });
-        }
-
-        async function syncAllWeeks() {
-          const y = Number($("yearBox").value || state.year);
-          if (Number.isFinite(y)) state.year = y;
-
-          clearAllWeeksGames();
-
-          setStatus("Syncing ALL weeks…", "warn");
-          try {
-            const weeks = state.weeks.slice()
-              .filter(w => w.weekNumber >= MIN_WEEK && w.weekNumber <= MAX_WEEK)
-              .sort((a, b) => a.weekNumber - b.weekNumber);
-
-            for (const w of weeks) {
-              await syncSpecificWeek(w);
-            }
-
-            saveState();
-            setStatus(`All weeks synced (${state.year}).`, "ok");
-            renderAll();
-            renderActuals();
-          } catch (e) {
-            console.error(e);
-            setStatus("All-weeks sync failed.", "bad");
-            alert(String(e?.message || e));
-          }
-        }
-
-        function openPreModal({ playerName, prePoints, text }) {
-          $("preModalTitle").textContent = `Preseason breakdown — ${playerName}`;
-          $("preModalSub").textContent = `Preseason points: ${prePoints}`;
-          $("preModalBody").textContent = text;
-          $("preModal").style.display = "flex";
-        }
-        function closePreModal() { $("preModal").style.display = "none"; }
-
-        function renderSelectedWeek() {
-          const week = getWeek();
-          if (!week) return;
-          $("weekNumberBox").value = week.weekNumber ?? MIN_WEEK;
-          $("weekMeta").textContent = buildWeekMeta(week);
+        function renderSelectedWeek(){
+          const week=getWeek(); if(!week) return;
+          $("weekNumberBox").value=week.weekNumber ?? MIN_WEEK;
+          $("weekMeta").textContent=buildWeekMeta(week);
           renderGames(week);
           renderPicksUI(week);
         }
 
-        function renderAll() {
+        function renderAll(){
           safeValue("yearBox", state.year);
           renderTeams();
           renderMap();
@@ -1546,197 +1209,271 @@ Miss St = Mississippi State'></textarea>
           renderSelectedWeek();
           renderPreseasonUI();
           saveState();
+          updateAuthUI();
         }
 
-        $("yearBox").onchange = () => {
-          const y = Number($("yearBox").value);
-          if (!Number.isFinite(y) || y < 2000 || y > 2100) return;
-          state.year = y;
+        // Events
+        $("yearBox").onchange=async ()=>{
+          if(!isAdmin()){ alert("Admin only."); $("yearBox").value=state.year; return; }
+          const y=Number($("yearBox").value);
+          if(!Number.isFinite(y) || y<2000 || y>2100) return;
+
+          state.year=y;
           clearAllWeeksGames();
-          saveState();
-          renderAll();
-          setStatus(`Season year set to ${y} (cleared weeks).`, "ok");
-          syncAllWeeks();
-        };
-
-        $("saveTeamsBtn") && ($("saveTeamsBtn").onclick = () => {
-          const teams = $("teamsBox").value.split("\n").map(x => x.trim()).filter(Boolean);
-          if (teams.length < 8) return alert("Add at least a few teams.");
-          state.teams = teams;
           saveState(); renderAll();
-          setStatus("Teams saved.", "ok");
-        });
+          setStatus(`Season year set to ${y}.`,"ok");
 
-        $("saveMapBtn") && ($("saveMapBtn").onclick = () => {
-          state.teamMap = parseMapBox($("mapBox").value);
-          saveState(); renderAll();
-          setStatus("Team map saved.", "ok");
-        });
-
-        $("saveScoringBtn") && ($("saveScoringBtn").onclick = () => {
-          state.scoring.weeklyPick = Number($("ptsWeekly").value || 0);
-          state.scoring.correctStanding = Number($("ptsStanding").value || 0);
-          state.scoring.exactRecord = Number($("ptsExact").value || 0);
-          state.scoring.withinOne = Number($("ptsWithin").value || 0);
-          state.scoring.correctUpset = Number($("ptsUpset").value || 0);
-          state.scoring.poty = Number($("ptsPOTY").value || 0);
-          saveState(); renderScoreboard();
-          setStatus("Scoring saved.", "ok");
-        });
-
-        $("addPlayerBtn") && ($("addPlayerBtn").onclick = () => {
-          const name = $("playerName").value.trim();
-          if (!name) return;
-          state.players.push({ id: uid(), name, preseason: { standingsOrder: [], records: {}, biggestUpset: "" } });
-          $("playerName").value = "";
-          saveState(); renderAll();
-          setStatus("Player added.", "ok");
-        });
-
-        $("weekSelect").onchange = () => {
-          renderSelectedWeek();
-          renderScoreboard();
-          renderActuals();
-        };
-
-        $("saveWeekBtn").onclick = () => {
-          const w = getWeek();
-          const wn = Number($("weekNumberBox").value);
-          if (!Number.isFinite(wn) || wn < MIN_WEEK || wn > MAX_WEEK) return alert(`Week must be ${MIN_WEEK}–${MAX_WEEK}.`);
-          w.weekNumber = wn;
-          w.name = `Week ${wn}`;
-          saveState();
-          renderWeeks();
-          renderSelectedWeek();
-          setStatus("Week saved.", "ok");
-        };
-
-        $("activePlayer")?.setAttribute("disabled", "disabled");
-        $("savePicksBtn").onclick = () => { saveState(); renderScoreboard(); setStatus("Picks saved.", "ok"); };
-
-        $("syncESPNBtn").onclick = syncWeekFromESPN;
-        $("syncAllBtn").onclick = syncAllWeeks;
-
-        $("recalcBtn").onclick = () => {
-          renderActuals();
-          renderScoreboard();
-          setStatus("Recalculated.", "ok");
-        };
-
-        $("saveActualUpsetBtn").onclick = () => {
-          if (!isAdmin()) {
-            alert("Admin only.");
-            return;
+          try{
+            await remotePutAdmin({ year: state.year, weeks: state.weeks });
+            applyRemoteToLocal(await remoteGetState());
+            saveState(); renderAll();
+          }catch(e){
+            console.error(e);
+            alert(String(e?.message||e));
           }
-          state.preseasonActual.biggestUpset = $("actualUpsetBox").value.trim();
-          saveState();
-          renderScoreboard();
-          setStatus("Actual biggest upset saved.", "ok");
         };
 
-        $("adminBtn")?.addEventListener("click", () => {
-          if (isAdmin()) adminLogout();
-          else adminLogin();
-        });
+        $("saveTeamsBtn").onclick=async ()=>{
+          if(!isAdmin()) return alert("Admin only.");
+          const teams=($("teamsBox").value||"").split("\n").map(x=>x.trim()).filter(Boolean);
+          if(teams.length<8) return alert("Add at least a few teams.");
+          try{
+            state.teams=teams;
+            await remotePutAdmin({ teams: state.teams });
+            applyRemoteToLocal(await remoteGetState());
+            ensureWeekExists(); renderAll();
+            setStatus("Teams saved (shared).","ok");
+          }catch(e){
+            console.error(e);
+            setStatus("Teams save failed.","bad");
+            alert(String(e?.message||e));
+          }
+        };
 
+        $("saveMapBtn").onclick=async ()=>{
+          if(!isAdmin()) return alert("Admin only.");
+          try{
+            state.teamMap=parseMapBox($("mapBox").value);
+            await remotePutAdmin({ teamMap: state.teamMap });
+            applyRemoteToLocal(await remoteGetState());
+            renderAll();
+            setStatus("Team map saved (shared).","ok");
+          }catch(e){
+            console.error(e);
+            setStatus("Map save failed.","bad");
+            alert(String(e?.message||e));
+          }
+        };
 
-        $("prePlayerSelect").onchange = renderPreseasonUI;
+        $("saveScoringBtn").onclick=async ()=>{
+          if(!isAdmin()) return alert("Admin only.");
+          try{
+            state.scoring.weeklyPick=Number($("ptsWeekly").value||0);
+            state.scoring.correctStanding=Number($("ptsStanding").value||0);
+            state.scoring.exactRecord=Number($("ptsExact").value||0);
+            state.scoring.withinOne=Number($("ptsWithin").value||0);
+            state.scoring.correctUpset=Number($("ptsUpset").value||0);
+            state.scoring.poty=Number($("ptsPOTY").value||0);
+            await remotePutAdmin({ scoring: state.scoring });
+            applyRemoteToLocal(await remoteGetState());
+            renderAll();
+            setStatus("Scoring saved (shared).","ok");
+          }catch(e){
+            console.error(e);
+            setStatus("Scoring save failed.","bad");
+            alert(String(e?.message||e));
+          }
+        };
 
-        $("savePreseasonBtn").onclick = () => {
-          const p = getPrePlayer();
-          if (!p) return;
+        $("addPlayerBtn").onclick=()=>{
+          const name=($("playerName").value||"").trim();
+          if(!name) return;
+          state.players.push({ id:uid(), name, preseason:{standingsOrder:[], records:{}, biggestUpset:""} });
+          $("playerName").value="";
+          saveState(); renderAll();
+          setStatus("Player added.","ok");
+        };
 
-          if (!p.preseason) p.preseason = {};
-          if (!Array.isArray(p.preseason.standingsOrder)) p.preseason.standingsOrder = [];
-          if (!p.preseason.records) p.preseason.records = {};
+        $("weekSelect").onchange=()=>{ renderSelectedWeek(); renderScoreboard(); renderActuals(); };
 
-          const selects = document.querySelectorAll('select[data-pre-rank]');
-          const order = [];
-          selects.forEach(sel => {
-            const rank = Number(sel.getAttribute("data-pre-rank"));
-            order[rank - 1] = (sel.value || "").trim();
+        $("saveWeekBtn").onclick=()=>{
+          if(!isAdmin()) return alert("Admin only.");
+          const w=getWeek();
+          const wn=Number($("weekNumberBox").value);
+          if(!Number.isFinite(wn) || wn<MIN_WEEK || wn>MAX_WEEK) return alert(`Week must be ${MIN_WEEK}–${MAX_WEEK}.`);
+          w.weekNumber=wn;
+          w.name=`Week ${wn}`;
+          saveState(); renderWeeks(); renderSelectedWeek();
+          setStatus("Week saved.","ok");
+        };
+
+        $("savePicksBtn").onclick=()=>{ saveState(); renderScoreboard(); setStatus("Picks saved.","ok"); };
+
+        $("syncESPNBtn").onclick=syncWeekFromESPN;
+        $("syncAllBtn").onclick=syncAllWeeks;
+
+        $("recalcBtn").onclick=()=>{ renderActuals(); renderScoreboard(); setStatus("Recalculated.","ok"); };
+
+        $("saveActualUpsetBtn").onclick=async ()=>{
+          if(!isAdmin()) return alert("Admin only.");
+          try{
+            state.preseasonActual.biggestUpset=($("actualUpsetBox").value||"").trim();
+            await remotePutAdmin({ preseasonActual: state.preseasonActual });
+            applyRemoteToLocal(await remoteGetState());
+            renderAll();
+            setStatus("Actual biggest upset saved (shared).","ok");
+          }catch(e){
+            console.error(e);
+            setStatus("Save failed.","bad");
+            alert(String(e?.message||e));
+          }
+        };
+
+        $("prePlayerSelect").onchange=renderPreseasonUI;
+
+        $("savePreseasonBtn").onclick=()=>{
+          const p=getPrePlayer();
+          if(!p) return;
+
+          if(!p.preseason) p.preseason={};
+          if(!Array.isArray(p.preseason.standingsOrder)) p.preseason.standingsOrder=[];
+          if(!p.preseason.records) p.preseason.records={};
+
+          const selects=document.querySelectorAll('select[data-pre-rank]');
+          const order=[];
+          selects.forEach(sel=>{
+            const rank=Number(sel.getAttribute("data-pre-rank"));
+            order[rank-1]=(sel.value||"").trim();
           });
-          p.preseason.standingsOrder = order;
+          p.preseason.standingsOrder=order;
 
-          for (const team of state.teams) {
-            const sel = document.querySelector(`select[data-pre-record="${team.replace(/"/g, '\\"')}"]`);
-            const v = (sel?.value || "").trim();
-            if (!v) { delete p.preseason.records[team]; continue; }
-            const m = v.match(/^(\d+)\-(\d+)$/);
-            if (!m) { delete p.preseason.records[team]; continue; }
-            const wins = Number(m[1]);
-            const losses = Number(m[2]);
-            if (!Number.isFinite(wins) || !Number.isFinite(losses)) { delete p.preseason.records[team]; continue; }
-            p.preseason.records[team] = { wins, losses };
+          for(const team of state.teams){
+            const sel=document.querySelector(`select[data-pre-record="${escapeAttr(team)}"]`);
+            const v=(sel?.value||"").trim();
+            if(!v){ delete p.preseason.records[team]; continue; }
+            const m=v.match(/^(\d+)\-(\d+)$/);
+            if(!m){ delete p.preseason.records[team]; continue; }
+            const wins=Number(m[1]), losses=Number(m[2]);
+            if(!Number.isFinite(wins) || !Number.isFinite(losses)){ delete p.preseason.records[team]; continue; }
+            p.preseason.records[team]={wins,losses};
           }
 
-          p.preseason.biggestUpset = $("preUpsetBox").value.trim();
-
-          saveState();
-          renderScoreboard();
-          setStatus("Preseason saved.", "ok");
+          p.preseason.biggestUpset=($("preUpsetBox").value||"").trim();
+          saveState(); renderScoreboard(); setStatus("Preseason saved.","ok");
         };
 
-        $("exportBtn") && ($("exportBtn").onclick = () => {
-          const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
-          const a = document.createElement("a");
-          a.href = URL.createObjectURL(blob);
-          a.download = "sec-picks-data.json";
+        $("exportBtn").onclick=()=>{
+          const blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"});
+          const a=document.createElement("a");
+          a.href=URL.createObjectURL(blob);
+          a.download="sec-picks-data.json";
           a.click();
           URL.revokeObjectURL(a.href);
-        });
+        };
 
-        $("importBtn") && ($("importBtn").onclick = async () => {
-          const inp = document.createElement("input");
-          inp.type = "file";
-          inp.accept = "application/json";
-          inp.onchange = async () => {
-            const f = inp.files?.[0];
-            if (!f) return;
-            const txt = await f.text();
-            try {
-              const obj = JSON.parse(txt);
-              state = obj;
-              if (!state.standingsMode) state.standingsMode = DEFAULT_STANDINGS_MODE;
-              if (!state.preseasonActual) state.preseasonActual = { biggestUpset: "" };
-              if (!state.scoring) state.scoring = { ...DEFAULT_SCORING };
+        $("importBtn").onclick=async ()=>{
+          if(!isAdmin()) return alert("Admin only.");
+          const inp=document.createElement("input");
+          inp.type="file"; inp.accept="application/json";
+          inp.onchange=async ()=>{
+            const f=inp.files?.[0];
+            if(!f) return;
+            const txt=await f.text();
+            try{
+              const obj=JSON.parse(txt);
+              state=obj;
+              if(!state.teamMap) state.teamMap={...DEFAULT_TEAM_MAP};
+              if(!state.preseasonActual) state.preseasonActual={biggestUpset:""};
+              if(!state.scoring) state.scoring={...DEFAULT_SCORING};
               ensureWeekExists();
               saveState();
-              renderAll();
-              setStatus("Imported.", "ok");
-            } catch {
+
+              await remotePutAdmin({
+                year: state.year, teams: state.teams, teamMap: state.teamMap, scoring: state.scoring,
+                weeks: state.weeks, preseasonActual: state.preseasonActual
+              });
+
+              applyRemoteToLocal(await remoteGetState());
+              ensureWeekExists(); renderAll();
+              setStatus("Imported (shared).","ok");
+            }catch(e){
+              console.error(e);
               alert("Invalid JSON.");
             }
           };
           inp.click();
-        });
+        };
 
-        $("resetBtn") && ($("resetBtn").onclick = () => {
-          if (!confirm("Reset EVERYTHING?")) return;
+        $("resetBtn").onclick=async ()=>{
+          if(!isAdmin()) return alert("Admin only.");
+          if(!confirm("Reset EVERYTHING (local) and overwrite shared admin fields?")) return;
+
           localStorage.removeItem(STORAGE_KEY);
-          state = loadState();
+          state=loadState();
           ensureWeekExists();
-          if (!state.standingsMode) state.standingsMode = DEFAULT_STANDINGS_MODE;
-          if (!state.preseasonActual) state.preseasonActual = { biggestUpset: "" };
+
+          try{
+            await remotePutAdmin({
+              year: state.year, teams: state.teams, teamMap: state.teamMap, scoring: state.scoring,
+              weeks: state.weeks, preseasonActual: state.preseasonActual
+            });
+            applyRemoteToLocal(await remoteGetState());
+          }catch(e){
+            console.error(e);
+            alert(String(e?.message||e));
+          }
+
           renderAll();
-          setStatus("Reset done.", "ok");
-        });
+          setStatus("Reset done.","ok");
+        };
 
-        $("preModalClose").onclick = closePreModal;
-        $("preModal").onclick = (e) => { if (e.target && e.target.id === "preModal") closePreModal(); };
-        document.addEventListener("keydown", (e) => { if (e.key === "Escape") closePreModal(); });
+        $("preModalClose").onclick=closePreModal;
+        $("preModal").onclick=(e)=>{ if(e.target && e.target.id==="preModal") closePreModal(); };
+        document.addEventListener("keydown",(e)=>{ if(e.key==="Escape") closePreModal(); });
 
-        $("loginBtn")?.addEventListener("click", loginExistingPlayer);
-        $("newPlayerBtn")?.addEventListener("click", createNewPlayer);
-        $("logoutBtn")?.addEventListener("click", logout);
+        $("loginBtn").addEventListener("click", loginExistingPlayer);
+        $("newPlayerBtn").addEventListener("click", createNewPlayer);
+        $("logoutBtn").addEventListener("click", logout);
+        $("adminBtn").addEventListener("click", ()=> isAdmin() ? adminLogout() : adminLogin());
 
         ensureWeekExists();
         renderAll();
-        updateAuthUI();
+
+        // Initial pull from shared (everyone)
+        (async ()=>{
+          try{
+            const remote=await remoteGetState();
+            if(remote){
+              setRemotePill(true,"Shared: on");
+              applyRemoteToLocal(remote);
+              ensureWeekExists();
+              renderAll();
+            }else{
+              setRemotePill(false,"Shared: off");
+            }
+          }catch(e){
+            console.warn("Shared storage unavailable:", e);
+            setRemotePill(false,"Shared: off");
+          }
+        })();
+
+        // periodic pull
+        setInterval(async ()=>{
+          try{
+            const remote=await remoteGetState();
+            if(!remote) return;
+            const remoteStamp=Number(remote.updatedAt||0);
+            const localStamp=Number(state.remoteUpdatedAt||0);
+            if(remoteStamp && remoteStamp!==localStamp){
+              applyRemoteToLocal(remote);
+              ensureWeekExists();
+              renderAll();
+              setStatus("Updated from shared league.","ok");
+            }
+          }catch{}
+        }, 15000);
       })();
     </script>
-
   </div>
 </body>
-
 </html>
