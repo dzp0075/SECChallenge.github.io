@@ -1709,7 +1709,7 @@ Miss St = Mississippi State'></textarea>
             setStatus(`Synced Week ${weekNumber} (${week.games.length} games)`, "ok");
             renderAll();
             renderActuals();
-            await loadLeagueFromSheets();
+            await publishLeagueFromSheets();
             loadSharedFromSheets();
           } catch (e) {
             console.error(e);
@@ -1752,7 +1752,7 @@ Miss St = Mississippi State'></textarea>
             setStatus(`All weeks synced (${state.year}).`, "ok");
             renderAll();
             renderActuals();
-            await loadLeagueFromSheets();
+            await publishLeagueFromSheets();
             loadSharedFromSheets();
           } catch (e) {
             console.error(e);
