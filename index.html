@@ -593,8 +593,6 @@ Miss St = Mississippi State'></textarea>
         }
 
 
-
-
         // stable key for a game across devices
         function gameKey(g) {
           if (g?.eventId) return `E:${g.eventId}`;
@@ -658,19 +656,38 @@ Miss St = Mississippi State'></textarea>
           const playerId = String(player.id || "").trim();
           if (!playerId) return;
 
-          // ensure player exists locally (so scoreboard shows them)
+          // ensure player exists locally (DEDUPED)
+          const incomingName = String(player.name || "").trim();
+
           let p = state.players.find(x => x.id === playerId);
+
+          // if ID not found, try match by name (case-insensitive)
+          if (!p && incomingName) {
+            const nameNorm = norm(incomingName);
+            p = state.players.find(x => norm(x.name) === nameNorm);
+
+            if (p) {
+              // adopt Sheets playerId so future saves are consistent
+              p.id = playerId;
+            }
+          }
+
           if (!p) {
             p = {
               id: playerId,
-              name: String(player.name || `Player ${playerId.slice(0, 6)}`),
-              preseason: player.preseason || { standingsOrder: [], records: {}, biggestUpset: "" }
+              name: incomingName || `Player ${playerId.slice(0, 6)}`,
+              preseason: player.preseason || {
+                standingsOrder: [],
+                records: {},
+                biggestUpset: ""
+              }
             };
             state.players.push(p);
           } else {
-            if (player.name) p.name = String(player.name);
+            if (incomingName) p.name = incomingName;
             if (player.preseason) p.preseason = player.preseason;
           }
+
 
           const weeksObj = payload.weeks || {};
           for (const wk of (state.weeks || [])) {
@@ -853,6 +870,11 @@ Miss St = Mississippi State'></textarea>
 
         const uid = () => Math.random().toString(16).slice(2) + Date.now().toString(16);
 
+        function findPlayerByName(name) {
+          const n = norm(name);
+          return state.players.find(p => norm(p.name) === n) || null;
+        }
+
         function loginExistingPlayer() {
           const name = prompt("Enter your name (case-insensitive):");
           if (!name) return;
@@ -872,14 +894,21 @@ Miss St = Mississippi State'></textarea>
           const name = prompt("Enter your name:");
           if (!name) return;
 
-          if (state.players.some(p => norm(p.name) === norm(name))) {
-            alert("That name already exists. Use Login instead.");
+          const clean = name.trim();
+          if (!clean) return;
+
+          const existing = findPlayerByName(clean);
+          if (existing) {
+            alert("That player already exists. Logging you in instead.");
+            setSessionPlayer(existing);
+            renderAll();
+            updateAuthUI();
             return;
           }
 
           const p = {
             id: uid(),
-            name: name.trim(),
+            name: clean,
             preseason: { standingsOrder: [], records: {}, biggestUpset: "" }
           };
 
@@ -889,6 +918,7 @@ Miss St = Mississippi State'></textarea>
           renderAll();
           updateAuthUI();
         }
+
 
         function logout() {
           clearSessionPlayer();
@@ -1957,11 +1987,27 @@ Miss St = Mississippi State'></textarea>
         $("addPlayerBtn") && ($("addPlayerBtn").onclick = () => {
           const name = $("playerName").value.trim();
           if (!name) return;
-          state.players.push({ id: uid(), name, preseason: { standingsOrder: [], records: {}, biggestUpset: "" } });
+
+          const existing = findPlayerByName(name);
+          if (existing) {
+            alert("That player already exists.");
+            $("playerName").value = "";
+            return;
+          }
+
+          state.players.push({
+            id: uid(),
+            name,
+            preseason: { standingsOrder: [], records: {}, biggestUpset: "" }
+          });
+
           $("playerName").value = "";
-          saveState(); renderAll();
+          saveState();
+          renderAll();
           setStatus("Player added.", "ok");
+          publishLeagueToSheets();
         });
+
 
         $("weekSelect").onchange = () => {
           renderSelectedWeek();
