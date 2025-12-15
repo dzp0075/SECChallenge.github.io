@@ -543,6 +543,7 @@ Miss St = Mississippi State'></textarea>
           poty: 0
         };
 
+        let SYNC_TOKEN = 0;
 
         const ESPN_BASE = "https://site.api.espn.com/apis/site/v2/sports/football/college-football/scoreboard";
         const $ = (id) => document.getElementById(id);
@@ -550,7 +551,49 @@ Miss St = Mississippi State'></textarea>
         // ===== Google Sheets (Apps Script Web App) =====
         const SHEETS_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbw2Gk3W5f72qFENYY52hBvspFFn3C3mUyJjY_2EkcUnhWZtA_GCJ-Gh36Oy07yZYsz6lg/exec"; // .../exec
 
-        function seasonKey() { return String(state.year || new Date().getFullYear()); }
+        function seasonKey() {
+          const raw = $("yearBox")?.value;
+
+          // if empty/undefined, fall back to state.year
+          if (raw == null || String(raw).trim() === "") {
+            return String(state.year || new Date().getFullYear());
+          }
+
+          const y = Number(raw);
+          if (Number.isFinite(y) && y >= 2000 && y <= 2100) return String(y);
+
+          return String(state.year || new Date().getFullYear());
+        }
+
+        function week1StartDate(year) {
+          // Week 1 = first Saturday on/after Sept 1
+          const d = new Date(Date.UTC(year, 8, 1)); // Sept 1 (month=8)
+          const day = d.getUTCDay(); // 0=Sun..6=Sat
+          const add = (6 - day + 7) % 7; // days until Saturday
+          d.setUTCDate(d.getUTCDate() + add);
+          return d; // Date object (UTC)
+        }
+
+
+        function weekDateRange(year, week) {
+          // CFB Week 1 usually starts late August
+          // This aligns with ESPN’s internal calendar
+          const seasonStart = week1StartDate(year);
+          const start = new Date(seasonStart);
+          start.setUTCDate(start.getUTCDate() + (week - 1) * 7);
+          const end = new Date(start);
+          end.setUTCDate(end.getUTCDate() + 6);
+
+          const fmt = d =>
+            d.getUTCFullYear().toString() +
+            String(d.getUTCMonth() + 1).padStart(2, "0") +
+            String(d.getUTCDate()).padStart(2, "0");
+
+          return `${fmt(start)}-${fmt(end)}`;
+        }
+
+
+
 
         // stable key for a game across devices
         function gameKey(g) {
@@ -720,7 +763,6 @@ Miss St = Mississippi State'></textarea>
         function applyLeagueSnapshot(snap) {
           if (!snap || !snap.weeks) return;
 
-          state.year = snap.year ?? state.year;
           state.teams = Array.isArray(snap.teams) ? snap.teams : state.teams;
           state.teamMap = snap.teamMap || state.teamMap;
           state.scoring = snap.scoring || state.scoring;
@@ -773,6 +815,7 @@ Miss St = Mississippi State'></textarea>
           try {
             const players = await sheetsLoadSeason(seasonKey()); // returns {playerId: payload}
             const league = players[LEAGUE_ID];
+
             if (league) applyLeagueSnapshot(league);
           } catch (e) {
             console.warn("loadLeagueFromSheets:", e);
@@ -781,8 +824,6 @@ Miss St = Mississippi State'></textarea>
 
 
         // =============================================
-
-
 
 
         const SESSION_PLAYER_KEY = "sec_session_player_id_v1";
@@ -1036,18 +1077,31 @@ Miss St = Mississippi State'></textarea>
         window.localNameFromESPN = localNameFromESPN;
 
         async function fetchESPNScoreboard({ year, weekNumber }) {
-          const espnWeek = Number(weekNumber);
+          const dates = weekDateRange(year, weekNumber);
+
           const u = new URL(ESPN_BASE);
           u.searchParams.set("groups", "8");
           u.searchParams.set("seasontype", "2");
-          u.searchParams.set("week", String(espnWeek));
-          u.searchParams.set("year", String(year));
+          u.searchParams.set("dates", dates);
           u.searchParams.set("limit", "400");
 
+          console.log("[ESPN DATES]", { year, weekNumber, dates, url: u.toString() });
+
           const res = await fetch(u.toString(), { cache: "no-store" });
-          if (!res.ok) throw new Error(`ESPN error ${res.status}`);
-          return res.json();
+          if (!res.ok) throw new Error(`ESPN ${res.status}`);
+
+          const data = await res.json();
+
+          console.log("[ESPN RESP]", {
+            apiYear: data?.season?.year,
+            firstDate: data?.events?.[0]?.date,
+            events: data?.events?.length
+          });
+
+          return data;
         }
+
+
 
         function parseESPNGames(json) {
           const events = json?.events || [];
@@ -1768,36 +1822,46 @@ Miss St = Mississippi State'></textarea>
           });
         }
 
+
         async function syncAllWeeks() {
           if (!isAdmin()) { alert("Admin only."); return; }
+
+          const myToken = ++SYNC_TOKEN;
 
           const y = Number($("yearBox").value || state.year);
           if (Number.isFinite(y)) state.year = y;
 
           clearAllWeeksGames();
+          saveState();
+          renderAll();
 
-          setStatus("Syncing ALL weeks…", "warn");
+          setStatus(`Syncing ALL weeks… (${state.year})`, "warn");
           try {
             const weeks = state.weeks.slice()
               .filter(w => w.weekNumber >= MIN_WEEK && w.weekNumber <= MAX_WEEK)
               .sort((a, b) => a.weekNumber - b.weekNumber);
 
             for (const w of weeks) {
-              await syncSpecificWeek(w);
+              if (myToken !== SYNC_TOKEN) return; // year changed → abort
+              await syncSpecificWeek(w, state.year);
             }
+
+            if (myToken !== SYNC_TOKEN) return;
 
             saveState();
             setStatus(`All weeks synced (${state.year}).`, "ok");
             renderAll();
             renderActuals();
             await publishLeagueToSheets();
-            loadSharedFromSheets();
+            await loadSharedFromSheets();
           } catch (e) {
             console.error(e);
             setStatus("All-weeks sync failed.", "bad");
             alert(String(e?.message || e));
           }
         }
+
+
 
         function openPreModal({ playerName, prePoints, text }) {
           $("preModalTitle").textContent = `Preseason breakdown — ${playerName}`;
@@ -1830,16 +1894,37 @@ Miss St = Mississippi State'></textarea>
           saveState();
         }
 
-        $("yearBox").onchange = () => {
+        $("yearBox").onchange = async () => {
           const y = Number($("yearBox").value);
           if (!Number.isFinite(y) || y < 2000 || y > 2100) return;
+
           state.year = y;
+          $("yearBox").value = String(y);
           clearAllWeeksGames();
           saveState();
           renderAll();
           setStatus(`Season year set to ${y} (cleared weeks).`, "ok");
-          syncAllWeeks();
+
+          // If admin, sync now
+          if (isAdmin()) {
+            try {
+              await syncAllWeeks();          // <-- await it
+              await loadLeagueFromSheets();  // <-- reload the shared league snapshot for this season
+              await loadSharedFromSheets();  // <-- reload players
+              renderAll();
+            } catch (e) {
+              console.error(e);
+            }
+          } else {
+            // Non-admin just loads what’s already saved for that season
+            await loadLeagueFromSheets();
+            await loadSharedFromSheets();
+            renderAll();
+          }
         };
+
+
+
 
         $("saveTeamsBtn") && ($("saveTeamsBtn").onclick = () => {
           const teams = $("teamsBox").value.split("\n").map(x => x.trim()).filter(Boolean);
