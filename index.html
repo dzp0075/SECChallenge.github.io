@@ -559,15 +559,15 @@ function gameKey(g){
 }
 
 async function sheetsSavePlayerPayload(season, playerId, payload){
-  if (!SHEETS_WEBAPP_URL || SHEETS_WEBAPP_URL.includes("PASTE_")) return;
   const r = await fetch(SHEETS_WEBAPP_URL, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "text/plain;charset=utf-8" }, // ✅ no CORS preflight
     body: JSON.stringify({ season, playerId, picks: payload })
   });
   const j = await r.json();
   if (!j.ok) throw new Error(j.error || "Sheets save failed");
 }
+
 
 async function sheetsLoadSeason(season){
   if (!SHEETS_WEBAPP_URL || SHEETS_WEBAPP_URL.includes("PASTE_")) return {};
