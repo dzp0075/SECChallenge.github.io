@@ -1,6 +1,6 @@
-# 📘 SEC Football Pick’em — Web Application  
-A full‑featured SEC football pick’em platform with live ESPN data, preseason predictions, weekly picks, automated scoring, and real‑time leaderboards.  
-Built entirely with **vanilla JavaScript**, **HTML**, and **CSS**, and synced through a **serverless Google Sheets backend**.
+# 🏈 SEC Football Pick’em — Web Application
+A full‑featured SEC football pick’em platform with live ESPN data, preseason predictions, weekly picks, automated scoring, and real‑time leaderboards.
+Built entirely with **vanilla JavaScript**, **HTML**, and **CSS**, and synced through a **Supabase backend**.
 
 ---
 
@@ -15,7 +15,7 @@ Built entirely with **vanilla JavaScript**, **HTML**, and **CSS**, and synced th
 - Users select winners for every SEC game each week  
 - “Double‑Down” mechanic for bonus points  
 - Automatic lockout at kickoff  
-- Picks saved locally and synced to Google Sheets for multi‑device access  
+- Picks saved locally and synced to Supabase for multi‑device access
 
 ### 🔮 Preseason Predictions
 - Rank all SEC teams (1–16)  
@@ -34,18 +34,18 @@ Built entirely with **vanilla JavaScript**, **HTML**, and **CSS**, and synced th
 - Automatic recalculation when data updates  
 
 ### 🛠️ Admin Tools
-- Sync any week or all weeks from ESPN  
-- Update scoring rules  
-- Manage teams and ESPN name mappings  
-- Publish league snapshots to Google Sheets  
-- Set actual preseason upset  
-- Reset the entire application  
+- Sync any week or all weeks from ESPN
+- Update scoring rules
+- Manage teams and ESPN name mappings
+- Publish league snapshots to Supabase
+- Set actual preseason upset
+- Reset the entire application
 
 ### 💾 State Management
-- LocalStorage for fast client‑side state  
-- SessionStorage for active player identity  
-- Google Sheets for shared multi‑user data  
-- JSON import/export for backups  
+- LocalStorage for fast client‑side state
+- SessionStorage for active player identity
+- Supabase (Postgres) for shared multi‑user data
+- JSON import/export for backups
 
 ---
 
@@ -54,8 +54,8 @@ Built entirely with **vanilla JavaScript**, **HTML**, and **CSS**, and synced th
 | Layer | Technology |
 |-------|------------|
 | Frontend | HTML, CSS, Vanilla JavaScript |
-| Backend | Google Apps Script Web App (serverless) |
-| Data Storage | Google Sheets + LocalStorage |
+| Backend | Supabase (Postgres + REST API) |
+| Data Storage | Supabase + LocalStorage |
 | API | ESPN College Football Scoreboard API |
 | Deployment | GitHub Pages |
 
@@ -64,12 +64,11 @@ Built entirely with **vanilla JavaScript**, **HTML**, and **CSS**, and synced th
 ## 📂 Project Structure
 
 ```
-index.html
-└── <script> … full application logic … </script>
-└── <style> … custom dark UI theme … </style>
+index.html          ← full application (HTML + CSS + JS)
+supabase-setup.sql  ← run once in Supabase SQL Editor to create the picks table
 ```
 
-Everything runs client‑side except the Google Sheets sync endpoint.
+Everything runs client‑side. Supabase is used only for syncing picks across devices.
 
 ---
 
@@ -83,11 +82,17 @@ git clone https://github.com/<your-username>/<repo-name>.git
 ### 2. Open `index.html` in a browser  
 No build step. No dependencies.
 
-### 3. (Optional) Configure Google Sheets backend  
-Deploy a Google Apps Script Web App and update:
+### 3. Configure Supabase backend
+1. Create a free project at [supabase.com](https://supabase.com)
+2. Run `supabase-setup.sql` in your project's **SQL Editor**
+3. Find your credentials:
+   - **Project URL** — on your project's home page
+   - **Anon key** — **Settings → API Keys → Legacy anon, service_role API keys → `anon`**
+4. Paste them into `index.html`:
 
 ```js
-const SHEETS_WEBAPP_URL = "https://script.google.com/macros/s/XXXXX/exec";
+const SUPABASE_URL      = "https://your-project.supabase.co";
+const SUPABASE_ANON_KEY = "eyJ...";
 ```
 
 ### 4. Deploy via GitHub Pages  
