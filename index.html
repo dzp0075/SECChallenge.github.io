@@ -689,8 +689,13 @@ Miss St = Mississippi State'></textarea>
         const ESPN_BASE = "https://site.api.espn.com/apis/site/v2/sports/football/college-football/scoreboard";
         const $ = (id) => document.getElementById(id);
 
-        // ===== Google Sheets (Apps Script Web App) =====
-        const SHEETS_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbw2Gk3W5f72qFENYY52hBvspFFn3C3mUyJjY_2EkcUnhWZtA_GCJ-Gh36Oy07yZYsz6lg/exec"; // .../exec
+        // ===== Supabase Backend =====
+        // 1. Create a free project at https://supabase.com
+        // 2. Run supabase-setup.sql in your project's SQL Editor
+        // 3. Paste your project URL and anon key below (Settings → API)
+        const SUPABASE_URL      = "https://hnghqyjohnmnbkfqyfsn.supabase.co";       // e.g. https://abcxyz.supabase.co
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhuZ2hxeWpvaG5tbmJrZnF5ZnNuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzNTU2MzQsImV4cCI6MjA4ODkzMTYzNH0.wXO2GXjOGN1mP4puBErtJFjdugfjurhG5bfePARm4cs";  // starts with "eyJ..."
+        const SUPABASE_TABLE    = "picks";
 
         function seasonKey() {
           const raw = $("yearBox")?.value;
@@ -740,23 +745,44 @@ Miss St = Mississippi State'></textarea>
           return `K:${norm(g.away)}@${norm(g.home)}|${(g.start || "").slice(0, 10)}`;
         }
 
-        async function sheetsSavePlayerPayload(season, playerId, payload) {
-          const r = await fetch(SHEETS_WEBAPP_URL, {
-            method: "POST",
-            headers: { "Content-Type": "text/plain;charset=utf-8" }, // ✅ no CORS preflight
-            body: JSON.stringify({ season, playerId, picks: payload })
-          });
-          const j = await r.json();
-          if (!j.ok) throw new Error(j.error || "Sheets save failed");
+        function supabaseConfigured() {
+          return SUPABASE_URL && !SUPABASE_URL.includes("YOUR_") &&
+                 SUPABASE_ANON_KEY && !SUPABASE_ANON_KEY.includes("YOUR_");
         }
 
+        function supabaseHeaders() {
+          return {
+            "Content-Type":  "application/json",
+            "apikey":        SUPABASE_ANON_KEY,
+            "Authorization": `Bearer ${SUPABASE_ANON_KEY}`
+          };
+        }
 
-        async function sheetsLoadSeason(season) {
-          if (!SHEETS_WEBAPP_URL || SHEETS_WEBAPP_URL.includes("PASTE_")) return {};
-          const r = await fetch(`${SHEETS_WEBAPP_URL}?season=${encodeURIComponent(season)}`);
-          const j = await r.json();
-          if (!j.ok) throw new Error(j.error || "Sheets load failed");
-          return j.players || {};
+        async function supabaseSavePayload(season, playerId, payload) {
+          if (!supabaseConfigured()) return;
+          const r = await fetch(`${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}?on_conflict=season,player_id`, {
+            method:  "POST",
+            headers: { ...supabaseHeaders(), "Prefer": "return=minimal,resolution=merge-duplicates" },
+            body:    JSON.stringify({
+              season,
+              player_id:  playerId,
+              payload,
+              updated_at: new Date().toISOString()
+            })
+          });
+          if (!r.ok) throw new Error(`Supabase save failed: ${await r.text()}`);
+        }
+
+        async function supabaseLoadSeason(season) {
+          if (!supabaseConfigured()) return {};
+          const r = await fetch(
+            `${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}?season=eq.${encodeURIComponent(season)}&select=player_id,payload`,
+            { headers: supabaseHeaders() }
+          );
+          if (!r.ok) throw new Error(`Supabase load failed: ${await r.text()}`);
+          const rows = await r.json();
+          // reshape array → { playerId: payload } to match existing callers
+          return Object.fromEntries(rows.map(row => [row.player_id, row.payload]));
         }
 
         // Export one player's whole pick state (weekly + preseason) using stable keys.
@@ -858,20 +884,18 @@ Miss St = Mississippi State'></textarea>
           }
         }
 
-        // Debounced autosave to Sheets (avoid spamming)
-        let __sheetsSaveTimer = null;
+        // Debounced autosave to Supabase (avoid spamming on every keystroke)
+        let __saveTimer = null;
         function queueSheetsSave() {
-          clearTimeout(__sheetsSaveTimer);
-          __sheetsSaveTimer = setTimeout(async () => {
+          clearTimeout(__saveTimer);
+          __saveTimer = setTimeout(async () => {
             const sp = getSessionPlayer();
             if (!sp) return;
             try {
               const payload = buildPlayerPayload(sp.id);
-              await sheetsSavePlayerPayload(seasonKey(), sp.id, payload);
-              // optional: setStatus("Saved to Sheets.", "ok");
+              await supabaseSavePayload(seasonKey(), sp.id, payload);
             } catch (e) {
               console.warn(e);
-              // optional: setStatus("Sheets save failed.", "bad");
             }
           }, 600);
         }
@@ -879,11 +903,11 @@ Miss St = Mississippi State'></textarea>
         async function loadSharedFromSheets() {
           try {
             const season = seasonKey();
-            const players = await sheetsLoadSeason(season); // { playerId: payload, ... }
+            const players = await supabaseLoadSeason(season); // { playerId: payload, ... }
             Object.values(players).forEach(applyPlayerPayload);
             saveState();
             renderAll();
-            setStatus("Loaded shared picks from Sheets.", "ok");
+            setStatus("Loaded shared picks.", "ok");
           } catch (e) {
             console.warn(e);
           }
@@ -963,20 +987,19 @@ Miss St = Mississippi State'></textarea>
           if (!isAdmin()) return;
           try {
             const snap = buildLeagueSnapshot();
-            await sheetsSavePlayerPayload(seasonKey(), LEAGUE_ID, snap);
+            await supabaseSavePayload(seasonKey(), LEAGUE_ID, snap);
           } catch (e) {
-            console.warn("publishLeagueToSheets:", e);
+            console.warn("publishLeague:", e);
           }
         }
 
         async function loadLeagueFromSheets() {
           try {
-            const players = await sheetsLoadSeason(seasonKey()); // returns {playerId: payload}
+            const players = await supabaseLoadSeason(seasonKey());
             const league = players[LEAGUE_ID];
-
             if (league) applyLeagueSnapshot(league);
           } catch (e) {
-            console.warn("loadLeagueFromSheets:", e);
+            console.warn("loadLeague:", e);
           }
         }
 
