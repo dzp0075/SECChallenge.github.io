@@ -808,25 +808,16 @@ Miss St = Mississippi State'></textarea>
 
           <!-- Weekly games panel -->
           <div id="weekPanel">
-            <div class="split">
-              <div class="col">
+            <div class="col">
+              <div class="row sp" style="align-items:center;margin-bottom:8px;">
                 <div class="small" id="weekMeta"></div>
-                <div class="hr"></div>
-                <div class="col" id="gamesBox"></div>
-              </div>
-
-              <div class="col">
-                <label>Player picks (winner + double-down)</label>
-                <div class="small">Pick a winner for every game. Choose one double-down game (worth 2× for that game).</div>
-                <div class="hr"></div>
-
                 <div class="row">
                   <select id="activePlayer" style="display:none"></select>
                   <button class="btn primary" id="savePicksBtn">Save Picks</button>
                 </div>
-
-                <div class="col" id="picksUI" style="margin-top:10px;"></div>
               </div>
+              <div class="hr"></div>
+              <div class="col" id="gamesBox"></div>
             </div>
           </div>
 
@@ -1782,148 +1773,106 @@ Miss St = Mississippi State'></textarea>
           const box = $("gamesBox");
           if (!box) return;
           box.innerHTML = "";
+
           const games = week.games || [];
+          const locked = isWeekLocked(week);
+          const p = getActivePlayer();
+
           if (games.length === 0) {
             box.innerHTML = `<div class="small muted">No games loaded yet. Click <b>Sync</b>.</div>`;
             return;
           }
 
-          games.forEach(g => {
-            const d = document.createElement("div");
-            d.className = "game";
-            const dateTxt = g.start ? new Date(g.start).toLocaleString() : "";
-            const scoreTxt = (g.awayScore != null && g.homeScore != null) ? `${g.awayScore}–${g.homeScore}` : "";
-            const tag = g.confGame ? `<span class="tag conf">SEC vs SEC</span>` : `<span class="tag">SEC game</span>`;
-            const winTxt = g.winner
-              ? `<span class="tag"><span class="win">FINAL</span> · ${escapeHtml(g.winner)}</span>`
-              : `<span class="tag muted">Pending</span>`;
-            d.innerHTML = `
-              <div class="gTop">
-                <div class="gTeams">
-                  ${tag}
-                  <span class="small mono">${escapeHtml(dateTxt)}</span>
-                </div>
-                <div class="mono small">${escapeHtml(scoreTxt)}</div>
-              </div>
-              <div class="game-teams">
-                ${escapeHtml(g.away)} <span class="vs">@</span> ${escapeHtml(g.home)}
-              </div>
-              <div>${winTxt}</div>
-            `;
-            box.appendChild(d);
-          });
-        }
-
-        function renderPicksUI(week) {
-          const locked = isWeekLocked(week);
-          const wrap = $("picksUI");
-          if (!wrap) return;
-          wrap.innerHTML = "";
           if (locked) {
             const note = document.createElement("div");
             note.className = "pill warn";
             note.textContent = "Week locked (kickoff has passed). Picks are read-only.";
-            wrap.appendChild(note);
-
-            const hr = document.createElement("div");
-            hr.className = "hr";
-            wrap.appendChild(hr);
+            box.appendChild(note);
+            const hr = document.createElement("div"); hr.className = "hr";
+            box.appendChild(hr);
           }
-
-          const p = getActivePlayer();
-          const games = week.games || [];
 
           if (!p) {
-            wrap.innerHTML = `
-              <div class="small">
-                You’re viewing in read-only mode. Click <b>Login</b> or <b>New Player</b> to make picks.
-              </div>
-            `;
-            return;
+            const note = document.createElement("div");
+            note.className = "small";
+            note.innerHTML = `You’re viewing in read-only mode. Click <b>Login</b> or <b>New Player</b> to make picks.`;
+            box.appendChild(note);
+            const hr = document.createElement("div"); hr.className = "hr";
+            box.appendChild(hr);
           }
 
-          if (games.length === 0) {
-            wrap.innerHTML = `<div class="small">Sync games first.</div>`;
-            return;
+          if (p) {
+            if (!week.picks) week.picks = {};
+            if (!week.picks[p.id]) week.picks[p.id] = { winners: {}, doubleDownGameId: "" };
           }
-
-          if (!week.picks) week.picks = {};
-          if (!week.picks[p.id]) week.picks[p.id] = { winners: {}, doubleDownGameId: "" };
-          const pk = week.picks[p.id];
-
-          const ddRow = document.createElement("div");
-          ddRow.className = "col";
-          ddRow.innerHTML = `
-            <label>Double-down game</label>
-            <select id="ddSelect"></select>
-            <div class="small">One per week. If correct, worth <b>2×</b> for that game.</div>
-            <div class="hr"></div>
-          `;
-          wrap.appendChild(ddRow);
-
-          const ddSelect = ddRow.querySelector("#ddSelect");
-          ddSelect.innerHTML = `<option value="">(none)</option>` + games.map(g => {
-            const label = `${g.away} @ ${g.home}`;
-            return `<option value="${g.id}">${escapeHtml(label)}</option>`;
-          }).join("");
-          ddSelect.value = pk.doubleDownGameId || "";
-
-          if (locked) {
-            ddSelect.disabled = true;
-          }
-
-          ddSelect.onchange = () => {
-            pk.doubleDownGameId = ddSelect.value;
-            saveState();
-            renderScoreboard();
-            queueSheetsSave();
-          };
+          const pk = p ? week.picks[p.id] : null;
 
           games.forEach(g => {
             const div = document.createElement("div");
             div.className = "game";
-            const picked = pk.winners[g.id] || "";
+
+            const picked = pk?.winners[g.id] || "";
             const isFinal = Boolean(g.winner);
             const isCorrect = isFinal && picked && picked === g.winner;
             const isWrong = isFinal && picked && picked !== g.winner;
-            const dd = (pk.doubleDownGameId === g.id);
+            const dd = pk && (pk.doubleDownGameId === g.id);
+            const scoreTxt = (g.awayScore != null && g.homeScore != null) ? `${g.awayScore}–${g.homeScore}` : "";
+
+            const statusClass = isCorrect ? "ok" : isWrong ? "bad" : "muted";
+            const statusTxt = isFinal
+              ? (isCorrect ? "✓ Correct" : isWrong ? "✗ Wrong" : `FINAL${scoreTxt ? ` · ${scoreTxt}` : ""}`)
+              : "Pending";
+
+            const confTag = g.confGame
+              ? `<span class="tag conf">SEC vs SEC</span>`
+              : `<span class="tag">SEC game</span>`;
+            const ddTag = dd ? `<span class="tag dd">2×</span>` : "";
+
+            const dateTxt = g.start ? new Date(g.start).toLocaleString(undefined, { weekday:"short", month:"short", day:"numeric", hour:"numeric", minute:"2-digit" }) : "";
 
             div.innerHTML = `
               <div class="gTop">
-                <div class="gTeams">
-                  ${dd ? `<span class="tag dd">2× Down</span>` : `<span class="tag">Pick</span>`}
-                  ${g.confGame ? `<span class="tag conf">SEC vs SEC</span>` : `<span class="tag">SEC game</span>`}
-                </div>
-                <div class="tag ${isCorrect ? "ok" : isWrong ? "bad" : "muted"}">
-                  ${isFinal ? (isCorrect ? "✓ Correct" : isWrong ? "✗ Wrong" : "Final") : "Pending"}
-                </div>
+                <div class="gTeams">${confTag}${ddTag}${dateTxt ? `<span class="small muted">${escapeHtml(dateTxt)}</span>` : ""}</div>
+                <span class="tag ${statusClass}">${statusTxt}</span>
               </div>
               <div class="game-teams">${escapeHtml(g.away)} <span class="vs">@</span> ${escapeHtml(g.home)}</div>
-              <div class="row">
-                <label style="min-width:60px">Winner</label>
-                <select data-game="${g.id}">
+              ${isFinal ? `<div class="small muted" style="margin:2px 0 4px;">Winner: <b>${escapeHtml(g.winner)}</b></div>` : ""}
+              ${pk ? `
+              <div class="row" style="gap:8px;margin-top:6px;">
+                <select data-game="${g.id}" style="flex:1;"${locked ? " disabled" : ""}>
                   <option value="">(pick)</option>
                   <option value="${escapeAttr(g.away)}">${escapeHtml(g.away)}</option>
                   <option value="${escapeAttr(g.home)}">${escapeHtml(g.home)}</option>
                 </select>
-              </div>
+                <button class="btn${dd ? " primary" : ""} dd-btn" data-dd="${g.id}"${locked ? " disabled" : ""} title="Set as double-down (2×)">2×</button>
+              </div>` : ""}
             `;
-            const sel = div.querySelector("select[data-game]");
-            sel.value = picked;
 
-            if (locked) {
-              sel.disabled = true;
+            if (pk) {
+              const sel = div.querySelector("select[data-game]");
+              sel.value = picked;
+              sel.onchange = () => {
+                pk.winners[g.id] = sel.value;
+                saveState();
+                renderScoreboard();
+                queueSheetsSave();
+              };
+
+              div.querySelector(".dd-btn").onclick = () => {
+                if (locked) return;
+                pk.doubleDownGameId = (pk.doubleDownGameId === g.id) ? "" : g.id;
+                saveState();
+                renderScoreboard();
+                queueSheetsSave();
+                renderGames(week);
+              };
             }
 
-            sel.onchange = () => {
-              pk.winners[g.id] = sel.value;
-              saveState();
-              renderScoreboard();
-              queueSheetsSave();
-            };
-            wrap.appendChild(div);
+            box.appendChild(div);
           });
         }
+
+        function renderPicksUI(week) { /* merged into renderGames */ }
 
         function computeTeamResults(mode = getStandingsMode()) {
           const secSet = new Set(state.teams.map(t => norm(t)));
