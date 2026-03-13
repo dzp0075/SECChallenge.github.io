@@ -1303,6 +1303,8 @@ Miss St = Mississippi State'></textarea>
           setSessionPlayer(p);
           renderAll();
           updateAuthUI();
+          // Save initial payload so other devices see this player immediately
+          queueSheetsSave();
         }
 
 
@@ -2417,17 +2419,20 @@ Miss St = Mississippi State'></textarea>
             return;
           }
 
-          state.players.push({
+          const newP = {
             id: uid(),
             name,
             preseason: { standingsOrder: [], records: {}, biggestUpset: "" }
-          });
+          };
+          state.players.push(newP);
 
           $("playerName").value = "";
           saveState();
           renderAll();
           setStatus("Player added.", "ok");
           publishLeagueToSheets();
+          // Save initial payload so other devices see this player immediately
+          supabaseSavePayload(seasonKey(), newP.id, buildPlayerPayload(newP.id)).catch(e => console.warn("save player:", e));
         });
 
 
