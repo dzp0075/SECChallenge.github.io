@@ -7,101 +7,156 @@
   <title>SEC Pick'em — ESPN Live Tracker</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏈</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800;900&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #080f1e;
-      --card: #0d1628;
-      --card2: #0b1425;
-      --border: rgba(255, 255, 255, .10);
-      --text: #e8f0fe;
-      --muted: rgba(210, 225, 250, .62);
-      --btn: #18244a;
-      --btn2: #1e2f5a;
-      --accent: #4f8ef7;
-      --accent2: #3070d8;
-      --good: #34e88e;
-      --bad: #ff5f5f;
-      --warn: #ffbe42;
-      --gold: #f5c518;
-      --silver: #9bafc2;
-      --bronze: #c87941;
-      --shadow: 0 4px 20px rgba(0,0,0,.5), 0 1px 4px rgba(0,0,0,.3);
-      --shadow-lg: 0 24px 64px rgba(0,0,0,.65);
-      --r: 16px;
-      --r-sm: 10px;
-      font-synthesis-weight: none;
+      --bg: #0c0e14;
+      --surface: #12161f;
+      --surface2: #181d28;
+      --border: rgba(255,255,255,.08);
+      --border2: rgba(255,255,255,.13);
+      --text: #eef0f6;
+      --muted: rgba(200,210,230,.55);
+      --muted2: rgba(200,210,230,.35);
+      --gold: #F0A500;
+      --gold2: #c8880a;
+      --accent: #3b82f6;
+      --accent2: #1d4ed8;
+      --good: #22c55e;
+      --bad: #ef4444;
+      --warn: #f59e0b;
+      --rank1: #F0A500;
+      --rank2: #94a3b8;
+      --rank3: #b87333;
+      --r: 14px;
+      --r-sm: 8px;
     }
 
-    * { box-sizing: border-box }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      margin: 0;
-      font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-      background:
-        radial-gradient(1000px 600px at 15% 0%, rgba(50, 100, 255, .15), transparent 55%),
-        radial-gradient(800px 500px at 85% 25%, rgba(0, 210, 180, .09), transparent 55%),
-        radial-gradient(600px 400px at 50% 100%, rgba(255, 185, 55, .07), transparent 55%),
-        var(--bg);
+      font-family: 'DM Sans', system-ui, sans-serif;
+      background-color: var(--bg);
+      background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E"),
+        radial-gradient(ellipse 80% 50% at 20% -10%, rgba(240,165,0,.07) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 80% 110%, rgba(59,130,246,.06) 0%, transparent 55%);
       color: var(--text);
       -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
     }
 
+    /* ── Layout ── */
     .wrap {
-      max-width: 1240px;
+      max-width: 1280px;
       margin: 0 auto;
-      padding: 0 20px 80px;
+      padding: 0 24px 100px;
     }
 
-    /* ── Site Header ── */
+    .grid {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+
+    @media (max-width: 1000px) { .grid { grid-template-columns: 1fr } }
+
+    .col { display: flex; flex-direction: column; gap: 16px; }
+
+    /* ── Header ── */
     .site-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
       flex-wrap: wrap;
-      gap: 12px;
-      padding: 20px 0 18px;
-      margin-bottom: 18px;
-      border-bottom: 1px solid rgba(255,255,255,.07);
+      gap: 16px;
+      padding: 28px 0 24px;
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+    }
+
+    .site-header::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      width: 80px;
+      height: 2px;
+      background: var(--gold);
+      border-radius: 999px;
     }
 
     .site-title {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 14px;
     }
 
     .site-icon {
-      font-size: 28px;
+      font-size: 32px;
       line-height: 1;
-      filter: drop-shadow(0 2px 6px rgba(79,142,247,.4));
+      filter: drop-shadow(0 0 12px rgba(240,165,0,.5));
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-4px); }
     }
 
     .site-title h1 {
-      margin: 0;
-      font-size: 21px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 32px;
       font-weight: 900;
-      letter-spacing: -0.4px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: var(--text);
+      line-height: 1;
+    }
+
+    .site-title h1 span {
+      color: var(--gold);
     }
 
     .site-title .sub-tagline {
-      font-size: 12px;
+      font-size: 11px;
       color: var(--muted);
-      margin-top: 1px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-top: 3px;
+      font-weight: 500;
     }
 
     .badge {
       display: inline-flex;
       align-items: center;
-      gap: 4px;
-      padding: 4px 10px;
+      gap: 5px;
+      padding: 5px 12px;
       border-radius: 999px;
-      border: 1px solid rgba(79,142,247,.35);
-      background: rgba(79,142,247,.12);
-      color: var(--accent);
+      border: 1px solid rgba(240,165,0,.3);
+      background: rgba(240,165,0,.08);
+      color: var(--gold);
       font-size: 11px;
       font-weight: 600;
-      letter-spacing: .3px;
+      letter-spacing: .5px;
+      text-transform: uppercase;
+    }
+
+    .badge::before {
+      content: '';
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--good);
+      box-shadow: 0 0 6px var(--good);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: .6; transform: scale(.8); }
     }
 
     .site-nav {
@@ -111,47 +166,101 @@
       flex-wrap: wrap;
     }
 
-    h1 {
-      margin: 0 0 6px;
-      font-size: 22px;
-      font-weight: 800;
-      letter-spacing: -0.3px;
-    }
-
-    .sub {
-      margin: 0 0 16px;
-      color: var(--muted);
-      font-size: 13px;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: 1.15fr .85fr;
-      gap: 16px;
-    }
-
-    @media (max-width:980px) {
-      .grid { grid-template-columns: 1fr }
-    }
-
+    /* ── Cards ── */
     .card {
-      background: linear-gradient(160deg, rgba(255,255,255,.04) 0%, rgba(255,255,255,.01) 100%);
+      background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--r);
-      box-shadow: var(--shadow);
-      padding: 18px;
-      transition: box-shadow 0.2s ease;
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,.025) 0%, transparent 60%);
+      pointer-events: none;
     }
 
     .card h2 {
-      margin: 0 0 12px;
-      font-size: 11px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 13px;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: .7px;
+      letter-spacing: 1.5px;
       color: var(--muted);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
+    .card h2::before {
+      content: '';
+      display: block;
+      width: 3px;
+      height: 14px;
+      background: var(--gold);
+      border-radius: 999px;
+      flex-shrink: 0;
+    }
+
+    /* ── Buttons ── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--surface2);
+      border: 1px solid var(--border2);
+      color: var(--text);
+      padding: 8px 16px;
+      border-radius: var(--r-sm);
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 13px;
+      font-family: inherit;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+      letter-spacing: .2px;
+    }
+
+    .btn:hover {
+      background: rgba(255,255,255,.1);
+      border-color: rgba(255,255,255,.2);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0,0,0,.4);
+    }
+
+    .btn:active { transform: translateY(0) scale(0.98); }
+
+    .btn.primary {
+      background: var(--gold);
+      border-color: var(--gold);
+      color: #0c0e14;
+      font-weight: 700;
+      box-shadow: 0 2px 12px rgba(240,165,0,.3);
+    }
+
+    .btn.primary:hover {
+      background: #f5b820;
+      border-color: #f5b820;
+      box-shadow: 0 4px 20px rgba(240,165,0,.45);
+    }
+
+    .btn.danger {
+      background: rgba(239,68,68,.12);
+      border-color: rgba(239,68,68,.25);
+      color: #fca5a5;
+    }
+
+    .btn.danger:hover {
+      background: rgba(239,68,68,.2);
+      border-color: rgba(239,68,68,.4);
+    }
+
+    /* ── Form elements ── */
     .row {
       display: flex;
       gap: 10px;
@@ -159,25 +268,19 @@
       align-items: center;
     }
 
-    .sp { justify-content: space-between }
-
-    .col {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
+    .sp { justify-content: space-between; }
 
     label {
-      font-size: 12px;
-      font-weight: 500;
+      font-size: 11px;
+      font-weight: 600;
       color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .8px;
     }
 
-    input,
-    select,
-    textarea {
-      background: rgba(0,0,0,.28);
-      border: 1px solid rgba(255,255,255,.11);
+    input, select, textarea {
+      background: rgba(0,0,0,.35);
+      border: 1px solid var(--border);
       color: var(--text);
       padding: 9px 12px;
       border-radius: var(--r-sm);
@@ -188,224 +291,225 @@
       transition: border-color 0.15s ease, box-shadow 0.15s ease;
     }
 
-    input:focus,
-    select:focus,
-    textarea:focus {
-      border-color: rgba(79,142,247,.55);
-      box-shadow: 0 0 0 3px rgba(79,142,247,.12);
+    input:focus, select:focus, textarea:focus {
+      border-color: rgba(240,165,0,.5);
+      box-shadow: 0 0 0 3px rgba(240,165,0,.1);
     }
 
-    textarea {
-      min-height: 90px;
-      resize: vertical;
-    }
+    textarea { min-height: 90px; resize: vertical; }
 
-    .btn {
-      background: linear-gradient(165deg, var(--btn2), var(--btn));
-      border: 1px solid rgba(255,255,255,.1);
-      color: var(--text);
-      padding: 9px 14px;
-      border-radius: var(--r-sm);
-      cursor: pointer;
-      font-weight: 600;
-      font-size: 13px;
-      font-family: inherit;
-      white-space: nowrap;
-      transition: filter 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
-      letter-spacing: .1px;
-    }
-
-    .btn:hover {
-      filter: brightness(1.18);
-      box-shadow: 0 4px 14px rgba(0,0,0,.35);
-    }
-
-    .btn:active { transform: scale(0.97) }
-
-    .btn.primary {
-      background: linear-gradient(165deg, var(--accent), var(--accent2));
-      border-color: rgba(79,142,247,.4);
-      box-shadow: 0 2px 10px rgba(79,142,247,.22);
-    }
-
-    .btn.danger {
-      background: linear-gradient(165deg, #4a1818, #311010);
-      border-color: rgba(255,95,95,.2);
-    }
-
+    /* ── Status pill ── */
     .pill {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      padding: 5px 11px;
+      padding: 5px 12px;
       border-radius: 999px;
       border: 1px solid var(--border);
-      background: rgba(0,0,0,.25);
+      background: rgba(0,0,0,.3);
       color: var(--muted);
-      font-size: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .3px;
+      text-transform: uppercase;
     }
 
     .pill.warn {
-      border-color: rgba(255,190,66,.3);
-      background: rgba(255,190,66,.08);
+      border-color: rgba(245,158,11,.3);
+      background: rgba(245,158,11,.08);
       color: var(--warn);
     }
 
-    .ok  { color: var(--good) }
-    .bad { color: var(--bad)  }
+    /* ── Utility ── */
+    .ok   { color: var(--good) }
+    .bad  { color: var(--bad) }
     .warn { color: var(--warn) }
+    .muted { color: var(--muted) }
+    .right { text-align: right }
 
     .split {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 10px;
+      gap: 12px;
     }
 
-    @media (max-width:700px) {
-      .split { grid-template-columns: 1fr }
+    @media (max-width: 700px) { .split { grid-template-columns: 1fr } }
+
+    .small {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.6;
     }
 
+    .hr {
+      height: 1px;
+      background: var(--border);
+      margin: 14px 0;
+    }
+
+    .mono {
+      font-family: 'DM Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .sub {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 16px;
+      line-height: 1.5;
+    }
+
+    /* ── Player list ── */
     .list {
-      border: 1px solid rgba(255,255,255,.07);
-      border-radius: 14px;
-      padding: 10px;
-      background: rgba(0,0,0,.1);
+      border: 1px solid var(--border);
+      border-radius: var(--r-sm);
+      overflow: hidden;
+      background: rgba(0,0,0,.2);
     }
 
     .list .item {
       display: flex;
       justify-content: space-between;
-      gap: 10px;
       align-items: center;
-      padding: 10px 12px;
-      border-radius: var(--r-sm);
-      background: rgba(255,255,255,.025);
-      border: 1px solid rgba(255,255,255,.06);
-      margin-bottom: 6px;
-      transition: background 0.15s ease;
+      gap: 10px;
+      padding: 11px 14px;
+      border-bottom: 1px solid var(--border);
+      transition: background 0.12s ease;
     }
 
-    .list .item:hover { background: rgba(255,255,255,.05) }
-    .list .item:last-child { margin-bottom: 0 }
+    .list .item:last-child { border-bottom: none; }
+    .list .item:hover { background: rgba(255,255,255,.03); }
 
-    .small {
-      font-size: 12px;
-      color: var(--muted);
-      line-height: 1.5;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
+    /* ── Tables ── */
+    table { width: 100%; border-collapse: collapse; }
 
     th, td {
-      padding: 10px 8px;
-      border-bottom: 1px solid rgba(255,255,255,.06);
+      padding: 10px 10px;
       text-align: left;
       font-size: 13px;
+      border-bottom: 1px solid var(--border);
     }
 
     th {
-      color: var(--muted);
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 12px;
       font-weight: 700;
-      font-size: 11px;
       text-transform: uppercase;
-      letter-spacing: .5px;
-      border-bottom: 1px solid rgba(255,255,255,.11);
+      letter-spacing: 1px;
+      color: var(--muted);
+      background: rgba(0,0,0,.2);
+      border-bottom: 1px solid var(--border2);
     }
 
-    tbody tr { transition: background 0.12s ease }
-    tbody tr:hover { background: rgba(255,255,255,.03) }
+    tbody tr { transition: background 0.1s ease; }
+    tbody tr:hover { background: rgba(255,255,255,.03); }
+    tbody tr:last-child td { border-bottom: none; }
 
-    .right { text-align: right }
+    /* ── Rank badges ── */
+    .rank-1 {
+      color: var(--rank1);
+      font-weight: 800;
+      text-shadow: 0 0 10px rgba(240,165,0,.4);
+    }
+    .rank-2 { color: var(--rank2); font-weight: 700; }
+    .rank-3 { color: var(--rank3); font-weight: 700; }
 
-    /* Rank badges */
-    .rank-1 { color: var(--gold);   font-weight: 900; }
-    .rank-2 { color: var(--silver); font-weight: 900; }
-    .rank-3 { color: var(--bronze); font-weight: 900; }
-
+    /* ── Game cards ── */
     .game {
-      padding: 12px 14px;
-      border-radius: 12px;
-      border: 1px solid rgba(255,255,255,.08);
-      background: rgba(0,0,0,.25);
+      background: rgba(0,0,0,.3);
+      border: 1px solid var(--border);
+      border-radius: var(--r-sm);
+      padding: 14px;
       display: grid;
-      gap: 8px;
-      transition: border-color 0.15s ease, background 0.15s ease;
+      gap: 10px;
+      transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .game::after {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: var(--border2);
+      transition: background 0.15s ease;
     }
 
     .game:hover {
-      border-color: rgba(255,255,255,.14);
-      background: rgba(0,0,0,.32);
+      border-color: var(--border2);
+      background: rgba(0,0,0,.4);
+      transform: translateX(2px);
     }
 
+    .game:hover::after { background: var(--gold); }
+
     .game-teams {
-      font-size: 15px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 18px;
       font-weight: 800;
-      letter-spacing: -0.2px;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
     }
 
     .game-teams .vs {
       font-size: 11px;
-      font-weight: 500;
-      color: var(--muted);
-      opacity: .7;
+      font-weight: 600;
+      color: var(--muted2);
+      background: rgba(255,255,255,.06);
+      padding: 2px 7px;
+      border-radius: 4px;
+      letter-spacing: .5px;
     }
 
     .gTop {
       display: flex;
       justify-content: space-between;
-      gap: 10px;
+      gap: 8px;
       align-items: center;
     }
 
     .gTeams {
       display: flex;
-      gap: 8px;
+      gap: 6px;
       flex-wrap: wrap;
       align-items: center;
     }
 
+    /* ── Tags ── */
     .tag {
-      font-size: 11px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .6px;
+      text-transform: uppercase;
       color: var(--muted);
       border: 1px solid rgba(255,255,255,.1);
-      padding: 3px 8px;
-      border-radius: 999px;
-      font-weight: 500;
+      padding: 2px 8px;
+      border-radius: 4px;
     }
 
     .tag.conf {
-      border-color: rgba(79,142,247,.3);
-      color: rgba(100,160,255,.85);
-      background: rgba(79,142,247,.08);
+      border-color: rgba(59,130,246,.35);
+      color: rgba(147,197,253,.8);
+      background: rgba(59,130,246,.1);
     }
 
     .tag.dd {
-      border-color: rgba(255,190,66,.35);
-      color: var(--warn);
-      background: rgba(255,190,66,.1);
+      border-color: rgba(240,165,0,.4);
+      color: var(--gold);
+      background: rgba(240,165,0,.1);
     }
 
-    .win {
-      color: var(--good);
-      font-weight: 900;
-    }
+    /* ── Win indicator ── */
+    .win { color: var(--good); font-weight: 800; }
 
-    .muted { color: var(--muted) }
-
-    .hr {
-      height: 1px;
-      background: rgba(255,255,255,.08);
-      margin: 12px 0;
-    }
-
-    .mono {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    /* ── Modal ── */
+    #preModal {
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
     }
   </style>
 </head>
@@ -416,16 +520,16 @@
       <div class="site-title">
         <span class="site-icon">🏈</span>
         <div>
-          <h1>SEC Pick'em</h1>
+          <h1>SEC <span>Pick'em</span></h1>
           <div class="sub-tagline">Preseason + Weekly Tracker</div>
         </div>
-        <span class="badge">⚡ ESPN Live</span>
+        <span class="badge">ESPN Live</span>
       </div>
       <div class="site-nav">
         <button class="btn primary" id="loginBtn">Login</button>
         <button class="btn primary" id="newPlayerBtn">New Player</button>
         <button class="btn danger" id="logoutBtn" style="display:none">Logout</button>
-        <button class="btn" id="adminBtn">Admin</button>
+        <button class="btn" id="adminBtn">⚙ Admin</button>
       </div>
     </div>
 
@@ -622,25 +726,28 @@ Miss St = Mississippi State'></textarea>
     <!-- Preseason Breakdown Modal -->
     <div id="preModal" style="
       position:fixed; inset:0; display:none; align-items:center; justify-content:center;
-      background:rgba(0,0,0,.65); backdrop-filter:blur(6px); padding:18px; z-index:9999;">
+      background:rgba(0,0,0,.75); padding:20px; z-index:9999;">
       <div style="
-        width:min(560px, 100%); border:1px solid rgba(255,255,255,.13);
-        border-radius:20px;
-        background:linear-gradient(160deg, rgba(30,47,90,.95), rgba(8,15,30,.97));
-        box-shadow:0 32px 80px rgba(0,0,0,.7), 0 0 0 1px rgba(79,142,247,.12);
-        padding:20px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+        width:min(580px,100%);
+        border:1px solid rgba(240,165,0,.2);
+        border-radius:16px;
+        background:#12161f;
+        box-shadow:0 40px 100px rgba(0,0,0,.8), 0 0 0 1px rgba(240,165,0,.08);
+        padding:24px;
+        position:relative;
+        overflow:hidden;">
+        <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold),rgba(240,165,0,0));"></div>
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px; margin-bottom:16px;">
           <div>
-            <div id="preModalTitle" style="font-weight:900; font-size:16px; letter-spacing:-0.2px;">Preseason breakdown</div>
-            <div id="preModalSub" class="small" style="margin-top:3px;"></div>
+            <div id="preModalTitle" style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:22px;text-transform:uppercase;letter-spacing:.5px;">Preseason Breakdown</div>
+            <div id="preModalSub" class="small" style="margin-top:4px;"></div>
           </div>
-          <button class="btn danger" id="preModalClose">✕ Close</button>
+          <button class="btn danger" id="preModalClose" style="flex-shrink:0">✕ Close</button>
         </div>
-        <div class="hr"></div>
         <pre id="preModalBody" class="mono" style="
-          margin:0; white-space:pre-wrap; line-height:1.5; font-size:12px;
-          background:rgba(0,0,0,.3); border:1px solid rgba(255,255,255,.08);
-          border-radius:12px; padding:14px;"></pre>
+          margin:0; white-space:pre-wrap; line-height:1.6; font-size:12px;
+          background:rgba(0,0,0,.4); border:1px solid rgba(255,255,255,.07);
+          border-radius:8px; padding:16px; color:#c8d8f0;"></pre>
       </div>
     </div>
 
