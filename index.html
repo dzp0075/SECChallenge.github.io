@@ -1560,6 +1560,11 @@ Miss St = Mississippi State'></textarea>
           return Date.now() >= t; // lock at kickoff
         }
 
+        function isPreseasonLocked() {
+          const week1 = state.weeks.find(w => w.weekNumber === 1);
+          return week1 ? isWeekLocked(week1) : false;
+        }
+
         function parseMapBox(text) {
           const out = {};
           (text || "").split("\n").map(l => l.trim()).filter(Boolean).forEach(line => {
@@ -2174,6 +2179,16 @@ Miss St = Mississippi State'></textarea>
           recordsWrap.innerHTML = "";
           $("preUpsetBox").value = "";
 
+          const preseasonLocked = isPreseasonLocked();
+
+          if (preseasonLocked) {
+            const note = document.createElement("div");
+            note.className = "pill warn";
+            note.textContent = "Preseason locked (Week 1 has kicked off). Predictions are read-only.";
+            standingsWrap.parentElement.insertBefore(note, standingsWrap.parentElement.firstChild);
+            $("savePreseasonBtn").disabled = true;
+          }
+
           if (!p) {
             standingsWrap.innerHTML = `<div class="small muted">Login / New Player to set preseason.</div>`;
             recordsWrap.innerHTML = `<div class="small muted">Login / New Player to set preseason.</div>`;
@@ -2205,7 +2220,7 @@ Miss St = Mississippi State'></textarea>
             row.style.gap = "8px";
             row.innerHTML = `
               <label style="min-width:48px" class="mono">#${i}</label>
-              <select data-pre-rank="${i}" style="flex:1">${makeTeamOptions(p.preseason.standingsOrder[i - 1])}</select>
+              <select data-pre-rank="${i}" style="flex:1"${preseasonLocked ? " disabled" : ""}>${makeTeamOptions(p.preseason.standingsOrder[i - 1])}</select>
             `;
             grid.appendChild(row);
           }
@@ -2230,7 +2245,7 @@ Miss St = Mississippi State'></textarea>
             tr.innerHTML = `
               <td>${escapeHtml(team)}</td>
               <td class="right">
-                <select data-pre-record="${escapeAttr(team)}">
+                <select data-pre-record="${escapeAttr(team)}"${preseasonLocked ? " disabled" : ""}>
                   ${recordOptionsHtml(recStr)}
                 </select>
               </td>
@@ -2240,6 +2255,7 @@ Miss St = Mississippi State'></textarea>
 
           recordsWrap.appendChild(tbl);
           $("preUpsetBox").value = p.preseason.biggestUpset || "";
+          if (preseasonLocked) $("preUpsetBox").disabled = true;
         }
 
         async function syncSpecificWeek(week) {
