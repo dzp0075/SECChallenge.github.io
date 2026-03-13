@@ -37,6 +37,7 @@
 
     body {
       font-family: 'DM Sans', system-ui, sans-serif;
+      overflow-x: hidden;
       background-color: var(--bg);
       background-image:
         url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E"),
@@ -61,7 +62,7 @@
       align-items: start;
     }
 
-    @media (max-width: 1000px) { .grid { grid-template-columns: 1fr } }
+    @media (max-width: 1000px) { .grid { grid-template-columns: minmax(0, 1fr) } }
 
     .col { display: flex; flex-direction: column; gap: 16px; }
 
@@ -513,6 +514,123 @@
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
     }
+
+    /* ── Mobile ── */
+    @media (max-width: 600px) {
+      .wrap {
+        padding: 0 14px 80px;
+      }
+
+      .site-header {
+        padding: 18px 0 16px;
+        margin-bottom: 16px;
+        gap: 10px;
+      }
+
+      .site-icon { font-size: 24px; }
+
+      .site-title h1 { font-size: 24px; }
+
+      .site-title .sub-tagline { font-size: 10px; }
+
+      .badge {
+        display: none;
+      }
+
+      .site-nav {
+        width: 100%;
+        justify-content: flex-end;
+      }
+
+      .site-nav .btn {
+        padding: 7px 12px;
+        font-size: 12px;
+      }
+
+      .card {
+        padding: 14px;
+        border-radius: 10px;
+      }
+
+      .card h2 {
+        margin-bottom: 12px;
+      }
+
+      /* Week header stacks on mobile */
+      .week-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+      }
+
+      .week-header > .row {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 8px;
+        width: 100%;
+      }
+
+      /* Contain all card overflow on mobile */
+      .card {
+        overflow: hidden;
+      }
+
+      /* Scoreboard table: horizontal scroll */
+      #scoreboardBox {
+        overflow-x: scroll;
+        overflow-y: visible;
+        -webkit-overflow-scrolling: touch;
+        width: 100%;
+      }
+
+      #scoreboardBox table {
+        min-width: 560px;
+        width: max-content;
+      }
+
+      #scoreboardBox th,
+      #scoreboardBox td {
+        padding: 8px 6px;
+        font-size: 11px;
+      }
+
+      /* Actual results table */
+      #actualsBox {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      /* Game cards */
+      .game {
+        padding: 12px 12px 12px 15px;
+      }
+
+      .game-teams {
+        font-size: 15px;
+      }
+
+      /* Buttons in .row should fill available space */
+      .row .btn { flex: 1; justify-content: center; }
+
+      /* But keep danger/icon buttons from stretching weirdly */
+      .row .btn.danger { flex: 0 0 auto; }
+
+      /* Preseason panel */
+      #preseasonPanel .split {
+        grid-template-columns: 1fr;
+      }
+
+      th, td {
+        padding: 8px 8px;
+        font-size: 12px;
+      }
+
+      /* Modal */
+      #preModal > div {
+        max-height: 90vh;
+        overflow-y: auto;
+      }
+    }
   </style>
 </head>
 
@@ -621,7 +739,7 @@ Miss St = Mississippi State'></textarea>
         </div>
 
         <div class="card">
-          <div class="row sp">
+          <div class="row sp week-header">
             <h2>Weekly Picks</h2>
             <div class="row">
               <select id="weekSelect"></select>
