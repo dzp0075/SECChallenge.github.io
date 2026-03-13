@@ -1096,16 +1096,39 @@ Miss St = Mississippi State'></textarea>
         }
 
         const ADMIN_FLAG_KEY = "sec_admin_flag_v1";
-        const ADMIN_PIN = "1234"; // <-- change this
+        let __adminPin = null; // loaded from Supabase at startup, never hardcoded
+
+        async function loadAdminPin() {
+          if (!supabaseConfigured()) return;
+          try {
+            const r = await fetch(
+              `${SUPABASE_URL}/rest/v1/config?key=eq.admin_pin&select=value`,
+              { headers: supabaseHeaders() }
+            );
+            if (!r.ok) return;
+            const rows = await r.json();
+            if (rows.length) __adminPin = rows[0].value;
+          } catch (e) {
+            console.warn("Could not load admin PIN:", e);
+          }
+        }
 
         function isAdmin() {
           return sessionStorage.getItem(ADMIN_FLAG_KEY) === "1";
         }
 
-        function adminLogin() {
+        async function adminLogin() {
+          if (!__adminPin) {
+            setStatus("Loading admin PIN…", "warn");
+            await loadAdminPin();
+          }
+          if (!__adminPin) {
+            alert("Admin PIN not configured. Add it to the Supabase config table.");
+            return;
+          }
           const pin = prompt("Enter admin PIN:");
           if (!pin) return;
-          if (pin === ADMIN_PIN) {
+          if (pin === __adminPin) {
             sessionStorage.setItem(ADMIN_FLAG_KEY, "1");
             setStatus("Admin mode enabled.", "ok");
             renderAll();
@@ -2226,9 +2249,9 @@ Miss St = Mississippi State'></textarea>
           publishLeagueToSheets();
         };
 
-        $("adminBtn")?.addEventListener("click", () => {
+        $("adminBtn")?.addEventListener("click", async () => {
           if (isAdmin()) adminLogout();
-          else adminLogin();
+          else await adminLogin();
         });
 
 
@@ -2327,8 +2350,9 @@ Miss St = Mississippi State'></textarea>
 
 
         (async () => {
-          await loadLeagueFromSheets();     // ✅ shared games/results/scoring
-          await loadSharedFromSheets();     // ✅ shared player picks
+          await loadAdminPin();             // load PIN from Supabase (never stored in code)
+          await loadLeagueFromSheets();     // shared games/results/scoring
+          await loadSharedFromSheets();     // shared player picks
           renderAll();
           updateAuthUI();
         })();
