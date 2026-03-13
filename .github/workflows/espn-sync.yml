@@ -13,6 +13,7 @@ jobs:
       - name: Sync ESPN data to Supabase
         uses: actions/github-script@v7
         env:
+          FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
         with:
@@ -76,19 +77,24 @@ jobs:
             // ── save league snapshot to Supabase ─────────────────────────────
 
             async function saveSnapshot(snap) {
-              const res = await fetch(`${SUPABASE_URL}/rest/v1/picks`, {
+              const body = JSON.stringify({ payload: snap, updated_at: new Date().toISOString() });
+
+              // Try PATCH first (row already exists)
+              const patch = await fetch(
+                `${SUPABASE_URL}/rest/v1/picks?season=eq.${SEASON}&player_id=eq.${LEAGUE_ID}`,
+                { method: "PATCH", headers, body }
+              );
+              if (patch.ok) return;
+
+              // Row doesn't exist yet — INSERT
+              const post = await fetch(`${SUPABASE_URL}/rest/v1/picks`, {
                 method: "POST",
-                headers: { ...headers, "Prefer": "resolution=merge-duplicates,return=minimal" },
-                body: JSON.stringify({
-                  season:     SEASON,
-                  player_id:  LEAGUE_ID,
-                  payload:    snap,
-                  updated_at: new Date().toISOString()
-                })
+                headers,
+                body: JSON.stringify({ season: SEASON, player_id: LEAGUE_ID, payload: snap, updated_at: new Date().toISOString() })
               });
-              if (!res.ok) {
-                const text = await res.text();
-                throw new Error(`Supabase save failed: ${res.status} ${text}`);
+              if (!post.ok) {
+                const text = await post.text();
+                throw new Error(`Supabase save failed: ${post.status} ${text}`);
               }
             }
 
