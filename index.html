@@ -1828,7 +1828,16 @@ Miss St = Mississippi State'></textarea>
               : `<span class="tag">SEC game</span>`;
             const ddTag = dd ? `<span class="tag dd">2×</span>` : "";
 
-            const dateTxt = g.start ? new Date(g.start).toLocaleString(undefined, { weekday:"short", month:"short", day:"numeric", hour:"numeric", minute:"2-digit" }) : "";
+            const dateTxt = (() => {
+              if (!g.start) return "";
+              const d = new Date(g.start);
+              const tz = "America/New_York";
+              // ESPN uses T04:00Z (midnight ET) as a placeholder when no kickoff time is announced
+              const noTime = d.getUTCHours() === 4 && d.getUTCMinutes() === 0;
+              return noTime
+                ? d.toLocaleDateString(undefined, { timeZone: tz, weekday: "short", month: "short", day: "numeric" })
+                : d.toLocaleString(undefined, { timeZone: tz, weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+            })();
 
             div.innerHTML = `
               <div class="gTop">
