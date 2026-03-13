@@ -1200,6 +1200,9 @@ Miss St = Mississippi State'></textarea>
 
           // keep ordering
           state.weeks.sort((a, b) => a.weekNumber - b.weekNumber);
+
+          // ensure all 14 weeks always exist, even if snapshot was missing some
+          ensureWeekExists();
         }
 
         async function publishLeagueToSheets() {
@@ -2284,6 +2287,7 @@ Miss St = Mississippi State'></textarea>
 
             if (myToken !== SYNC_TOKEN) return;
 
+            ensureWeekExists(); // guarantee all 14 weeks present before saving
             saveState();
             setStatus(`All weeks synced (${state.year}).`, "ok");
             renderAll();
