@@ -1125,7 +1125,6 @@ Miss St = Mississippi State'></textarea>
             const season = seasonKey();
             const players = await supabaseLoadSeason(season); // { playerId: payload, ... }
             Object.values(players).forEach(applyPlayerPayload);
-            saveState();
             renderAll();
             setStatus("Loaded shared picks.", "ok");
           } catch (e) {
@@ -1369,24 +1368,20 @@ Miss St = Mississippi State'></textarea>
         const safeValue = (id, value) => { const el = $(id); if (el) el.value = value; };
 
         function loadState() {
-          const raw = localStorage.getItem(STORAGE_KEY);
-          if (!raw) {
-            return {
-              year: new Date().getFullYear(),
-              teams: [...DEFAULT_TEAMS],
-              teamMap: { ...DEFAULT_TEAM_MAP },
-              scoring: { ...DEFAULT_SCORING },
-              players: [],
-              weeks: [],
-              standingsMode: DEFAULT_STANDINGS_MODE,
-              preseasonActual: { biggestUpset: "" }
-            };
-          }
-          try { return JSON.parse(raw); }
-          catch { localStorage.removeItem(STORAGE_KEY); return loadState(); }
+          return {
+            year: new Date().getFullYear(),
+            teams: [...DEFAULT_TEAMS],
+            teamMap: { ...DEFAULT_TEAM_MAP },
+            scoring: { ...DEFAULT_SCORING },
+            players: [],
+            weeks: [],
+            standingsMode: DEFAULT_STANDINGS_MODE,
+            preseasonActual: { biggestUpset: "" }
+          };
         }
 
-        function saveState() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+        // State is kept in memory only — Supabase is the source of truth.
+        function saveState() { /* no-op: all persistence goes through Supabase */ }
 
         function setStatus(msg, tone = "") {
           const pill = $("statusPill");
@@ -1396,10 +1391,12 @@ Miss St = Mississippi State'></textarea>
           if (tone) pill.classList.add(tone);
         }
 
+        // Clear any legacy localStorage data from older versions
+        try { localStorage.removeItem(STORAGE_KEY); } catch {}
+
         let state = loadState();
         if (!state.teamMap || Object.keys(state.teamMap).length === 0) {
           state.teamMap = { ...DEFAULT_TEAM_MAP };
-          saveState();
         }
 
         if (!state.preseasonActual) state.preseasonActual = { biggestUpset: "" };
@@ -2562,7 +2559,6 @@ Miss St = Mississippi State'></textarea>
 
         $("resetBtn") && ($("resetBtn").onclick = () => {
           if (!confirm("Reset EVERYTHING?")) return;
-          localStorage.removeItem(STORAGE_KEY);
           state = loadState();
           ensureWeekExists();
           if (!state.standingsMode) state.standingsMode = DEFAULT_STANDINGS_MODE;
