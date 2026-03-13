@@ -1834,8 +1834,9 @@ Miss St = Mississippi State'></textarea>
               const tz = "America/New_York";
               // ESPN uses T04:00Z (midnight ET) as a placeholder when no kickoff time is announced
               const noTime = d.getUTCHours() === 4 && d.getUTCMinutes() === 0;
+              const dateStr = d.toLocaleDateString(undefined, { timeZone: tz, weekday: "short", month: "short", day: "numeric" });
               return noTime
-                ? d.toLocaleDateString(undefined, { timeZone: tz, weekday: "short", month: "short", day: "numeric" })
+                ? `${dateStr} · TBD`
                 : d.toLocaleString(undefined, { timeZone: tz, weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
             })();
 
