@@ -184,6 +184,8 @@
       pointer-events: none;
     }
 
+    h2 { font-size: 14px; font-weight: 600; margin: 0; }
+
     .card h2 {
       font-family: 'Barlow Condensed', sans-serif;
       font-size: 13px;
@@ -589,7 +591,7 @@ Miss St = Mississippi State'></textarea>
 
               <div class="row" style="margin-top:8px; justify-content:space-between;">
                 <span class="pill" id="statusPill">Ready</span>
-                <span class="small">Standings can be “conference-only” or “all games”.</span>
+                <span class="small">Standings can be "conference-only" or "all games".</span>
               </div>
             </div>
           </div>
@@ -627,25 +629,55 @@ Miss St = Mississippi State'></textarea>
             </div>
           </div>
 
-          <div class="split">
-            <div class="col">
-              <div class="small" id="weekMeta"></div>
-              <div class="hr"></div>
-              <div class="col" id="gamesBox"></div>
+          <!-- Weekly games panel -->
+          <div id="weekPanel">
+            <div class="split">
+              <div class="col">
+                <div class="small" id="weekMeta"></div>
+                <div class="hr"></div>
+                <div class="col" id="gamesBox"></div>
+              </div>
+
+              <div class="col">
+                <label>Player picks (winner + double-down)</label>
+                <div class="small">Pick a winner for every game. Choose one double-down game (worth 2× for that game).</div>
+                <div class="hr"></div>
+
+                <div class="row">
+                  <select id="activePlayer" style="display:none"></select>
+                  <button class="btn primary" id="savePicksBtn">Save Picks</button>
+                </div>
+
+                <div class="col" id="picksUI" style="margin-top:10px;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Preseason panel -->
+          <div id="preseasonPanel" style="display:none">
+            <div class="row" style="margin-bottom:14px;">
+              <select id="prePlayerSelect" style="display:none"></select>
+              <button class="btn primary" id="savePreseasonBtn">Save Preseason</button>
             </div>
 
-            <div class="col">
-              <label>Player picks (winner + double-down)</label>
-              <div class="small">Pick a winner for every game. Choose one double-down game (worth 2× for that game).
-              </div>
-              <div class="hr"></div>
-
-              <div class="row">
-                <select id="activePlayer" style="display:none"></select>
-                <button class="btn primary" id="savePicksBtn">Save Picks</button>
+            <div class="split">
+              <div class="col">
+                <label>Final SEC Standings</label>
+                <div class="small">Predict the final standings — pick a team for each position.</div>
+                <div class="hr"></div>
+                <div id="preStandingsUI"></div>
               </div>
 
-              <div class="col" id="picksUI" style="margin-top:10px;"></div>
+              <div class="col">
+                <label>Final Record Predictions</label>
+                <div class="small">Pick a win-loss record for every SEC team.</div>
+                <div class="hr"></div>
+                <div id="preRecordsUI"></div>
+                <div class="hr"></div>
+                <label>Biggest Upset</label>
+                <input id="preUpsetBox" placeholder="Example: Vanderbilt over Alabama (Week 6)" />
+                <div class="small">Compared to the admin-set actual upset for scoring.</div>
+              </div>
             </div>
           </div>
         </div>
@@ -665,52 +697,16 @@ Miss St = Mississippi State'></textarea>
           <div id="scoreboardBox"></div>
         </div>
 
-        <!-- ✅ Actual Results card now contains Preseason Predictions + Actual Upset -->
         <div class="card">
-          <h2>Actual results (auto-built)</h2>
-          <div class="small">Switch between conference-only standings (SEC vs SEC) or all-games standings.</div>
+          <h2>Actual Results</h2>
+          <div class="small">Conference-only standings (SEC vs SEC) updated automatically.</div>
           <div class="hr"></div>
-
           <div id="actualsBox"></div>
 
           <div class="hr"></div>
 
-          <h2>Preseason Predictions</h2>
-          <div class="small">Set preseason picks for the active player. Scoring is included in the scoreboard “Pre”
-            column.</div>
-          <div class="hr"></div>
-
-          <div class="row">
-            <select id="prePlayerSelect" style="display:none"></select>
-            <button class="btn" id="savePreseasonBtn">Save Preseason</button>
-          </div>
-
-          <div class="split" style="margin-top:8px;">
-            <div class="col">
-              <label>Final SEC standings (pick teams for each position)</label>
-              <div class="small">Use the dropdowns below. (Duplicates are allowed, but you probably don’t want them.)
-              </div>
-              <div class="hr"></div>
-              <div id="preStandingsUI"></div>
-            </div>
-
-            <div class="col">
-              <label>Final record predictions (all games, 0–12 to 12–0)</label>
-              <div class="small">Pick a record for every team using dropdowns.</div>
-              <div class="hr"></div>
-              <div id="preRecordsUI"></div>
-
-              <div class="hr"></div>
-              <label>Biggest upset (text)</label>
-              <input id="preUpsetBox" placeholder="Example: Vanderbilt over Alabama (Week 6)" />
-              <div class="small">Upset scoring is compared to the admin-set “Actual biggest upset”.</div>
-            </div>
-          </div>
-
-          <div class="hr"></div>
-
           <div class="col">
-            <label>Actual “Biggest upset” (admin)</label>
+            <label>Actual "Biggest Upset" (admin)</label>
             <div class="row">
               <input id="actualUpsetBox" placeholder="Example: Vanderbilt over Alabama (Week 6)" />
               <button class="btn" id="saveActualUpsetBtn">Save</button>
@@ -1568,11 +1564,12 @@ Miss St = Mississippi State'></textarea>
           const prev = ws.value;
           const sorted = state.weeks.slice().sort((a, b) => a.weekNumber - b.weekNumber);
 
-          ws.innerHTML = sorted
+          ws.innerHTML = `<option value="__preseason__">🏆 Preseason</option>` + sorted
             .map(w => `<option value="${w.id}">${escapeHtml(w.name || `Week ${w.weekNumber}`)}</option>`)
             .join("");
 
-          if (prev && state.weeks.some(w => w.id === prev)) ws.value = prev;
+          if (prev === "__preseason__") ws.value = "__preseason__";
+          else if (prev && state.weeks.some(w => w.id === prev)) ws.value = prev;
           else if (sorted.length) ws.value = sorted[0].id;
         }
 
@@ -2196,9 +2193,22 @@ Miss St = Mississippi State'></textarea>
         function closePreModal() { $("preModal").style.display = "none"; }
 
         function renderSelectedWeek() {
+          const sel = $("weekSelect")?.value;
+          const isPreseason = sel === "__preseason__";
+
+          $("weekPanel").style.display = isPreseason ? "none" : "";
+          $("preseasonPanel").style.display = isPreseason ? "" : "none";
+          $("saveWeekBtn").style.display = isPreseason ? "none" : "";
+
+          if (isPreseason) {
+            renderPreseasonUI();
+            return;
+          }
+
           const week = getWeek();
           if (!week) return;
-          $("weekNumberBox").value = week.weekNumber ?? MIN_WEEK;
+          const wnb = $("weekNumberBox");
+          if (wnb) wnb.value = week.weekNumber ?? MIN_WEEK;
           $("weekMeta").textContent = buildWeekMeta(week);
           renderGames(week);
           renderPicksUI(week);
@@ -2214,7 +2224,6 @@ Miss St = Mississippi State'></textarea>
           renderActuals();
           renderScoreboard();
           renderSelectedWeek();
-          renderPreseasonUI();
           saveState();
         }
 
@@ -2343,7 +2352,7 @@ Miss St = Mississippi State'></textarea>
           setStatus("Recalculated.", "ok");
         };
 
-        $("saveActualUpsetBtn").onclick = () => {
+        $("saveActualUpsetBtn") && ($("saveActualUpsetBtn").onclick = () => {
           if (!isAdmin()) {
             alert("Admin only.");
             return;
@@ -2353,7 +2362,7 @@ Miss St = Mississippi State'></textarea>
           renderScoreboard();
           setStatus("Actual biggest upset saved.", "ok");
           publishLeagueToSheets();
-        };
+        });
 
         $("adminBtn")?.addEventListener("click", async () => {
           if (isAdmin()) adminLogout();
