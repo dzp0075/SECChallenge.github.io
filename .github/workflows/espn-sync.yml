@@ -10,11 +10,6 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
-      - name: Setup Node.js 24
-        uses: actions/setup-node@v4
-        with:
-          node-version: 24
-
       - name: Sync ESPN data to Supabase
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
