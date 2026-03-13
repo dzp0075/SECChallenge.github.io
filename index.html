@@ -515,6 +515,9 @@
       -webkit-backdrop-filter: blur(8px);
     }
 
+    /* ── Tab bar (mobile only) ── */
+    .tab-bar { display: none; }
+
     /* ── Mobile ── */
     @media (max-width: 600px) {
       .wrap {
@@ -630,6 +633,62 @@
         max-height: 90vh;
         overflow-y: auto;
       }
+
+      /* ── Tab navigation ── */
+      .tab-bar {
+        display: flex;
+        position: fixed;
+        bottom: 0; left: 0; right: 0;
+        background: var(--surface);
+        border-top: 1px solid var(--border2);
+        z-index: 1000;
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+      }
+
+      .tab-btn {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 3px;
+        padding: 10px 4px;
+        background: none;
+        border: none;
+        color: var(--muted);
+        cursor: pointer;
+        font-family: inherit;
+        transition: color 0.15s ease, background 0.15s ease;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      .tab-btn.active {
+        color: var(--gold);
+        background: rgba(240,165,0,.06);
+      }
+
+      .tab-icon { font-size: 20px; line-height: 1; }
+
+      .tab-label {
+        font-size: 10px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+      }
+
+      /* On mobile: hide all tab cards by default, show only active */
+      .tab-card {
+        display: none !important;
+      }
+
+      .tab-card.tab-active {
+        display: block !important;
+      }
+
+      /* Extra bottom padding so content isn't behind the tab bar */
+      .wrap {
+        padding-bottom: calc(70px + env(safe-area-inset-bottom, 0px));
+      }
     }
   </style>
 </head>
@@ -658,7 +717,7 @@
       <!-- LEFT -->
       <div class="col">
 
-        <div class="card" id="leagueSetup" style="display:none">
+        <div class="card tab-card" id="leagueSetup" style="display:none">
           <div class="row sp">
             <h2>League Setup</h2>
             <div class="row">
@@ -738,7 +797,7 @@ Miss St = Mississippi State'></textarea>
           </div>
         </div>
 
-        <div class="card">
+        <div class="card tab-card" id="cardPicks">
           <div class="row sp week-header">
             <h2>Weekly Picks</h2>
             <div class="row">
@@ -805,7 +864,7 @@ Miss St = Mississippi State'></textarea>
       <!-- RIGHT -->
       <div class="col">
 
-        <div class="card">
+        <div class="card tab-card" id="cardScoreboard">
           <div class="row sp">
             <h2>Scoreboard</h2>
             <button class="btn primary" id="recalcBtn">↻ Recalculate</button>
@@ -815,7 +874,7 @@ Miss St = Mississippi State'></textarea>
           <div id="scoreboardBox"></div>
         </div>
 
-        <div class="card">
+        <div class="card tab-card" id="cardActuals">
           <h2>Actual Results</h2>
           <div class="small">Conference-only standings (SEC vs SEC) updated automatically.</div>
           <div class="hr"></div>
@@ -835,6 +894,26 @@ Miss St = Mississippi State'></textarea>
 
       </div>
     </div>
+
+    <!-- Mobile Tab Bar -->
+    <nav class="tab-bar" id="tabBar">
+      <button class="tab-btn" data-tab="cardPicks">
+        <span class="tab-icon">🏈</span>
+        <span class="tab-label">Picks</span>
+      </button>
+      <button class="tab-btn" data-tab="cardScoreboard">
+        <span class="tab-icon">🏆</span>
+        <span class="tab-label">Scores</span>
+      </button>
+      <button class="tab-btn" data-tab="cardActuals">
+        <span class="tab-icon">📊</span>
+        <span class="tab-label">Standings</span>
+      </button>
+      <button class="tab-btn" data-tab="leagueSetup" id="setupTabBtn" style="display:none">
+        <span class="tab-icon">⚙️</span>
+        <span class="tab-label">Setup</span>
+      </button>
+    </nav>
 
     <!-- Preseason Breakdown Modal -->
     <div id="preModal" style="
@@ -1459,6 +1538,12 @@ Miss St = Mississippi State'></textarea>
           // League setup only visible to admin
           const ls = $("leagueSetup");
           if (ls) ls.style.display = admin ? "" : "none";
+
+          // Show/hide Setup tab on mobile
+          const setupTabBtn = $("setupTabBtn");
+          if (setupTabBtn) setupTabBtn.style.display = admin ? "" : "none";
+          // If admin logged out while on Setup tab, switch to Picks
+          if (!admin && activeTab === "leagueSetup") setActiveTab("cardPicks");
 
           // Actual upset admin-only
           const au = $("actualUpsetBox");
@@ -2579,6 +2664,27 @@ Miss St = Mississippi State'></textarea>
         $("preModalClose").onclick = closePreModal;
         $("preModal").onclick = (e) => { if (e.target && e.target.id === "preModal") closePreModal(); };
         document.addEventListener("keydown", (e) => { if (e.key === "Escape") closePreModal(); });
+
+        // ── Mobile tabs ──
+        let activeTab = "cardPicks";
+
+        function setActiveTab(tabId) {
+          activeTab = tabId;
+          document.querySelectorAll(".tab-card").forEach(c => c.classList.remove("tab-active"));
+          const card = document.getElementById(tabId);
+          if (card) card.classList.add("tab-active");
+          document.querySelectorAll(".tab-btn").forEach(b => {
+            b.classList.toggle("active", b.dataset.tab === tabId);
+          });
+          window.scrollTo(0, 0);
+        }
+
+        document.querySelectorAll(".tab-btn").forEach(btn => {
+          btn.addEventListener("click", () => setActiveTab(btn.dataset.tab));
+        });
+
+        // Initialise first tab
+        setActiveTab("cardPicks");
 
         $("loginBtn")?.addEventListener("click", loginExistingPlayer);
         $("newPlayerBtn")?.addEventListener("click", createNewPlayer);
