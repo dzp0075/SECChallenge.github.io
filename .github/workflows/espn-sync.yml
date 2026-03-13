@@ -1,0 +1,194 @@
+name: ESPN Auto-Sync
+
+on:
+  schedule:
+    # Runs every Tuesday at 2:00 AM UTC (Monday night after games finish)
+    - cron: "0 2 * * 2"
+  workflow_dispatch: # allow manual trigger from GitHub Actions tab
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Sync ESPN data to Supabase
+        uses: actions/github-script@v7
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        with:
+          script: |
+            const SUPABASE_URL = process.env.SUPABASE_URL;
+            const SUPABASE_KEY = process.env.SUPABASE_ANON_KEY;
+            const LEAGUE_ID    = "__LEAGUE__";
+            const YEAR         = new Date().getFullYear();
+            const SEASON       = String(YEAR);
+            const NUM_WEEKS    = 14;
+
+            const headers = {
+              "apikey":        SUPABASE_KEY,
+              "Authorization": `Bearer ${SUPABASE_KEY}`,
+              "Content-Type":  "application/json",
+              "Prefer":        "return=minimal"
+            };
+
+            // ── helpers ──────────────────────────────────────────────────────
+
+            function norm(s) {
+              return String(s || "").toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "").trim();
+            }
+
+            function uid() {
+              return Math.random().toString(16).slice(2) + Date.now().toString(16);
+            }
+
+            function week1StartDate(year) {
+              const d = new Date(Date.UTC(year, 8, 1)); // Sept 1
+              const day = d.getUTCDay();
+              const add = (6 - day + 7) % 7;
+              d.setUTCDate(d.getUTCDate() + add);
+              return d;
+            }
+
+            function weekDateRange(year, week) {
+              const seasonStart = week1StartDate(year);
+              const start = new Date(seasonStart);
+              start.setUTCDate(start.getUTCDate() + (week - 1) * 7);
+              const end = new Date(start);
+              end.setUTCDate(end.getUTCDate() + 6);
+              const fmt = d =>
+                d.getUTCFullYear().toString() +
+                String(d.getUTCMonth() + 1).padStart(2, "0") +
+                String(d.getUTCDate()).padStart(2, "0");
+              return `${fmt(start)}-${fmt(end)}`;
+            }
+
+            // ── load league snapshot from Supabase ───────────────────────────
+
+            async function loadSnapshot() {
+              const res = await fetch(
+                `${SUPABASE_URL}/rest/v1/picks?select=payload&season=eq.${SEASON}&player_id=eq.${LEAGUE_ID}`,
+                { headers }
+              );
+              const rows = await res.json();
+              return rows?.[0]?.payload || null;
+            }
+
+            // ── save league snapshot to Supabase ─────────────────────────────
+
+            async function saveSnapshot(snap) {
+              const res = await fetch(`${SUPABASE_URL}/rest/v1/picks`, {
+                method: "POST",
+                headers: { ...headers, "Prefer": "resolution=merge-duplicates,return=minimal" },
+                body: JSON.stringify({
+                  season:     SEASON,
+                  player_id:  LEAGUE_ID,
+                  payload:    snap,
+                  updated_at: new Date().toISOString()
+                })
+              });
+              if (!res.ok) {
+                const text = await res.text();
+                throw new Error(`Supabase save failed: ${res.status} ${text}`);
+              }
+            }
+
+            // ── fetch + parse ESPN week ───────────────────────────────────────
+
+            async function fetchESPNWeek(year, weekNumber) {
+              const dates = weekDateRange(year, weekNumber);
+              const url = `https://site.api.espn.com/apis/site/v2/sports/football/college-football/scoreboard?groups=8&week=${weekNumber}&seasontype=2&dates=${dates}&limit=400`;
+              const res = await fetch(url);
+              if (!res.ok) throw new Error(`ESPN ${res.status} for week ${weekNumber}`);
+              return res.json();
+            }
+
+            function parseGames(json) {
+              const events = json?.events || [];
+              const games  = [];
+              for (const ev of events) {
+                const comp        = ev?.competitions?.[0];
+                const competitors = comp?.competitors || [];
+                const awayC = competitors.find(c => c.homeAway === "away");
+                const homeC = competitors.find(c => c.homeAway === "home");
+                if (!awayC || !homeC) continue;
+
+                const awayRaw = awayC?.team?.shortDisplayName || awayC?.team?.abbreviation || awayC?.team?.displayName || "Away";
+                const homeRaw = homeC?.team?.shortDisplayName || homeC?.team?.abbreviation || homeC?.team?.displayName || "Home";
+
+                const statusType = comp?.status?.type || {};
+                const completed  = Boolean(statusType.completed);
+                const awayScore  = Number(awayC?.score ?? NaN);
+                const homeScore  = Number(homeC?.score ?? NaN);
+
+                let winner = "";
+                if (completed) {
+                  if (awayC?.winner === true) winner = awayRaw;
+                  else if (homeC?.winner === true) winner = homeRaw;
+                }
+
+                games.push({
+                  id:        uid(),
+                  eventId:   ev?.id ? String(ev.id) : "",
+                  away:      awayRaw,
+                  home:      homeRaw,
+                  confGame:  false, // not needed for schedule sync
+                  start:     comp?.date || ev?.date || "",
+                  awayScore: Number.isFinite(awayScore) ? awayScore : null,
+                  homeScore: Number.isFinite(homeScore) ? homeScore : null,
+                  winner
+                });
+              }
+              return games;
+            }
+
+            function mergeGames(oldGames, newGames) {
+              const oldByEvent = new Map(oldGames.filter(g => g.eventId).map(g => [g.eventId, g]));
+              const oldByKey   = new Map(oldGames.map(g => [
+                `${norm(g.away)}@${norm(g.home)}|${(g.start || "").slice(0, 10)}`, g
+              ]));
+              return newGames.map(ng => {
+                const key   = `${norm(ng.away)}@${norm(ng.home)}|${(ng.start || "").slice(0, 10)}`;
+                const match = (ng.eventId && oldByEvent.get(ng.eventId)) || oldByKey.get(key);
+                return match ? { ...ng, id: match.id } : ng;
+              });
+            }
+
+            // ── main ─────────────────────────────────────────────────────────
+
+            const snap = await loadSnapshot();
+            if (!snap) {
+              console.log("No league snapshot found in Supabase — skipping sync.");
+              return;
+            }
+
+            const weekMap = new Map((snap.weeks || []).map(w => [w.weekNumber, w]));
+
+            let updated = 0;
+            for (let wk = 1; wk <= NUM_WEEKS; wk++) {
+              try {
+                const json     = await fetchESPNWeek(YEAR, wk);
+                const newGames = parseGames(json);
+                if (newGames.length === 0) {
+                  console.log(`Week ${wk}: no games returned, skipping.`);
+                  continue;
+                }
+
+                let week = weekMap.get(wk);
+                if (!week) {
+                  week = { id: uid(), name: `Week ${wk}`, weekNumber: wk, games: [] };
+                  snap.weeks.push(week);
+                  weekMap.set(wk, week);
+                }
+
+                week.games = mergeGames(week.games || [], newGames);
+                console.log(`Week ${wk}: ${newGames.length} games synced.`);
+                updated++;
+              } catch (err) {
+                console.warn(`Week ${wk} error: ${err.message}`);
+              }
+            }
+
+            snap.weeks.sort((a, b) => a.weekNumber - b.weekNumber);
+
+            await saveSnapshot(snap);
+            console.log(`Done — ${updated} weeks updated for ${YEAR} season.`);
