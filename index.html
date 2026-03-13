@@ -538,7 +538,7 @@
       <!-- LEFT -->
       <div class="col">
 
-        <div class="card" id="leagueSetup">
+        <div class="card" id="leagueSetup" style="display:none">
           <div class="row sp">
             <h2>League Setup</h2>
             <div class="row">
@@ -602,6 +602,20 @@ Miss St = Mississippi State'></textarea>
             <button class="btn" id="addPlayerBtn">Add</button>
           </div>
           <div class="list" id="playersList" style="margin-top:10px;"></div>
+
+          <div class="hr"></div>
+
+          <h2>Game Sync</h2>
+          <div class="row" style="gap:12px; flex-wrap:wrap;">
+            <div style="display:flex;flex-direction:column;gap:6px;">
+              <label>Week #</label>
+              <input id="weekNumberBox" type="number" min="1" max="14" step="1" value="1" style="width:100px" />
+            </div>
+            <div class="row" style="align-self:flex-end;">
+              <button class="btn primary" id="syncESPNBtn">⚡ Sync Week from ESPN</button>
+              <button class="btn" id="syncAllBtn">Sync All Weeks</button>
+            </div>
+          </div>
         </div>
 
         <div class="card">
@@ -615,22 +629,7 @@ Miss St = Mississippi State'></textarea>
 
           <div class="split">
             <div class="col">
-              <div class="row sp">
-                <label>Load games</label>
-                <div class="row">
-                  <button class="btn primary" id="syncESPNBtn">⚡ Sync Week from ESPN</button>
-                  <button class="btn" id="syncAllBtn">Sync All Weeks</button>
-                </div>
-              </div>
-
-              <div class="split">
-                <div>
-                  <label>Week #</label>
-                  <input id="weekNumberBox" type="number" min="1" max="14" step="1" value="1" />
-                </div>
-              </div>
-
-              <div class="small" id="weekMeta" style="margin-top:6px;"></div>
+              <div class="small" id="weekMeta"></div>
               <div class="hr"></div>
               <div class="col" id="gamesBox"></div>
             </div>
